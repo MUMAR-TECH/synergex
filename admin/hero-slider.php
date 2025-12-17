@@ -91,6 +91,28 @@ include 'includes/admin_header.php';
 <div class="alert alert-error"><?php echo $error; ?></div>
 <?php endif; ?>
 
+<!-- Search and Filter -->
+<div style="background: white; padding: 1.5rem; border-radius: 10px; margin-bottom: 1.5rem; box-shadow: 0 2px 10px rgba(0,0,0,0.05);">
+    <div style="display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 1rem; align-items: end;">
+        <div class="form-group" style="margin-bottom: 0;">
+            <label for="searchSlides">Search Slides</label>
+            <input type="text" id="searchSlides" placeholder="Search by title, subtitle..." 
+                   onkeyup="filterSlides()" style="margin-bottom: 0;">
+        </div>
+        <div class="form-group" style="margin-bottom: 0;">
+            <label for="filterStatus">Filter by Status</label>
+            <select id="filterStatus" onchange="filterSlides()" style="margin-bottom: 0;">
+                <option value="">All Status</option>
+                <option value="active">Active</option>
+                <option value="inactive">Inactive</option>
+            </select>
+        </div>
+        <div>
+            <button class="btn btn-secondary" onclick="resetSlideFilters()">Reset Filters</button>
+        </div>
+    </div>
+</div>
+
 <div class="table-responsive">
     <table class="data-table">
         <thead>
@@ -104,14 +126,16 @@ include 'includes/admin_header.php';
                 <th>Actions</th>
             </tr>
         </thead>
-        <tbody>
+        <tbody id="slidesTableBody">
             <?php if (empty($slides)): ?>
             <tr>
                 <td colspan="7" style="text-align: center; padding: 2rem;">No slides yet. Add your first slide to get started.</td>
             </tr>
             <?php else: ?>
             <?php foreach ($slides as $slide): ?>
-            <tr>
+            <tr data-title="<?php echo strtolower(htmlspecialchars($slide['title'] ?? '')); ?>"
+                data-subtitle="<?php echo strtolower(htmlspecialchars($slide['subtitle'] ?? '')); ?>"
+                data-status="<?php echo $slide['is_active'] ? 'active' : 'inactive'; ?>">
                 <td>
                     <?php if ($slide['image']): ?>
                     <img src="<?php echo UPLOAD_URL . $slide['image']; ?>" alt="<?php echo htmlspecialchars($slide['title']); ?>" 
@@ -319,6 +343,30 @@ window.onclick = function(event) {
     if (event.target == modal) {
         closeModal();
     }
+}
+
+// Search and Filter Functions
+function filterSlides() {
+    const searchTerm = document.getElementById('searchSlides').value.toLowerCase();
+    const statusFilter = document.getElementById('filterStatus').value;
+    const rows = document.querySelectorAll('#slidesTableBody tr');
+    
+    rows.forEach(row => {
+        const title = row.dataset.title || '';
+        const subtitle = row.dataset.subtitle || '';
+        const status = row.dataset.status || '';
+        
+        const matchesSearch = title.includes(searchTerm) || subtitle.includes(searchTerm);
+        const matchesStatus = !statusFilter || status === statusFilter;
+        
+        row.style.display = (matchesSearch && matchesStatus) ? '' : 'none';
+    });
+}
+
+function resetSlideFilters() {
+    document.getElementById('searchSlides').value = '';
+    document.getElementById('filterStatus').value = '';
+    filterSlides();
 }
 </script>
 

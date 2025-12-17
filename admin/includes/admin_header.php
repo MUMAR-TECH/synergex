@@ -50,6 +50,12 @@ $currentPage = basename($_SERVER['PHP_SELF'], '.php');
                 <a href="achievements.php" class="nav-item <?php echo $currentPage == 'achievements' ? 'active' : ''; ?>">
                     <span>🏆</span> Achievements
                 </a>
+                <a href="partners.php" class="nav-item <?php echo $currentPage == 'partners' ? 'active' : ''; ?>">
+                    <span>🤝</span> Partners
+                </a>
+                <a href="content.php" class="nav-item <?php echo $currentPage == 'content' ? 'active' : ''; ?>">
+                    <span>📝</span> Page Content
+                </a>
                 <a href="subscribers.php" class="nav-item <?php echo $currentPage == 'subscribers' ? 'active' : ''; ?>">
                     <span>📧</span> Subscribers
                 </a>

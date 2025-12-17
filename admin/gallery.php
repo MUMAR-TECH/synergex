@@ -87,9 +87,37 @@ include 'includes/admin_header.php';
 <div class="alert alert-error"><?php echo $error; ?></div>
 <?php endif; ?>
 
-<div class="image-grid">
+<!-- Search and Filter -->
+<div style="background: white; padding: 1.5rem; border-radius: 10px; margin-bottom: 1.5rem; box-shadow: 0 2px 10px rgba(0,0,0,0.05);">
+    <div style="display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 1rem; align-items: end;">
+        <div class="form-group" style="margin-bottom: 0;">
+            <label for="searchGallery">Search Gallery</label>
+            <input type="text" id="searchGallery" placeholder="Search by title, caption..." 
+                   onkeyup="filterGallery()" style="margin-bottom: 0;">
+        </div>
+        <div class="form-group" style="margin-bottom: 0;">
+            <label for="filterCategory">Filter by Category</label>
+            <select id="filterCategory" onchange="filterGallery()" style="margin-bottom: 0;">
+                <option value="">All Categories</option>
+                <option value="waste_collection">Waste Collection</option>
+                <option value="recycling">Recycling</option>
+                <option value="production">Production</option>
+                <option value="installation">Installation</option>
+                <option value="community">Community</option>
+            </select>
+        </div>
+        <div>
+            <button class="btn btn-secondary" onclick="resetGalleryFilters()">Reset Filters</button>
+        </div>
+    </div>
+</div>
+
+<div class="image-grid" id="galleryGrid">
     <?php foreach ($galleryImages as $image): ?>
-    <div class="image-item">
+    <div class="image-item" 
+         data-title="<?php echo strtolower(htmlspecialchars($image['title'])); ?>"
+         data-caption="<?php echo strtolower(htmlspecialchars($image['caption'] ?? '')); ?>"
+         data-category="<?php echo $image['category']; ?>">
         <img src="<?php echo UPLOAD_URL . $image['image']; ?>" alt="<?php echo htmlspecialchars($image['title']); ?>">
         <div class="image-actions">
             <div>
@@ -270,6 +298,30 @@ window.onclick = function(event) {
     if (event.target == modal) {
         closeModal();
     }
+}
+
+// Search and Filter Functions
+function filterGallery() {
+    const searchTerm = document.getElementById('searchGallery').value.toLowerCase();
+    const categoryFilter = document.getElementById('filterCategory').value;
+    const items = document.querySelectorAll('#galleryGrid .image-item');
+    
+    items.forEach(item => {
+        const title = item.dataset.title || '';
+        const caption = item.dataset.caption || '';
+        const category = item.dataset.category || '';
+        
+        const matchesSearch = title.includes(searchTerm) || caption.includes(searchTerm);
+        const matchesCategory = !categoryFilter || category === categoryFilter;
+        
+        item.style.display = (matchesSearch && matchesCategory) ? '' : 'none';
+    });
+}
+
+function resetGalleryFilters() {
+    document.getElementById('searchGallery').value = '';
+    document.getElementById('filterCategory').value = '';
+    filterGallery();
 }
 </script>
 

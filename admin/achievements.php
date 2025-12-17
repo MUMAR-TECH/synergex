@@ -75,6 +75,31 @@ include 'includes/admin_header.php';
 <div class="alert alert-success"><?php echo $success; ?></div>
 <?php endif; ?>
 
+<!-- Search and Filter -->
+<div style="background: white; padding: 1.5rem; border-radius: 10px; margin-bottom: 1.5rem; box-shadow: 0 2px 10px rgba(0,0,0,0.05);">
+    <div style="display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 1rem; align-items: end;">
+        <div class="form-group" style="margin-bottom: 0;">
+            <label for="searchAchievements">Search Achievements</label>
+            <input type="text" id="searchAchievements" placeholder="Search by title, description..." 
+                   onkeyup="filterAchievements()" style="margin-bottom: 0;">
+        </div>
+        <div class="form-group" style="margin-bottom: 0;">
+            <label for="filterCategory">Filter by Category</label>
+            <select id="filterCategory" onchange="filterAchievements()" style="margin-bottom: 0;">
+                <option value="">All Categories</option>
+                <option value="grant">Grant</option>
+                <option value="pilot">Pilot Project</option>
+                <option value="recognition">Recognition</option>
+                <option value="partnership">Partnership</option>
+                <option value="media">Media Coverage</option>
+            </select>
+        </div>
+        <div>
+            <button class="btn btn-secondary" onclick="resetAchievementFilters()">Reset Filters</button>
+        </div>
+    </div>
+</div>
+
 <div class="table-responsive">
     <table class="data-table">
         <thead>
@@ -87,9 +112,11 @@ include 'includes/admin_header.php';
                 <th>Actions</th>
             </tr>
         </thead>
-        <tbody>
+        <tbody id="achievementsTableBody">
             <?php foreach ($achievements as $achievement): ?>
-            <tr>
+            <tr data-title="<?php echo strtolower(htmlspecialchars($achievement['title'])); ?>"
+                data-description="<?php echo strtolower(htmlspecialchars($achievement['description'] ?? '')); ?>"
+                data-category="<?php echo $achievement['category'] ?? ''; ?>">
                 <td><strong><?php echo $achievement['year']; ?></strong></td>
                 <td><?php echo htmlspecialchars($achievement['title']); ?></td>
                 <td><?php echo ucfirst(str_replace('_', ' ', $achievement['category'])); ?></td>
@@ -233,6 +260,30 @@ window.onclick = function(event) {
     if (event.target == document.getElementById('achievementModal')) {
         closeModal();
     }
+}
+
+// Search and Filter Functions
+function filterAchievements() {
+    const searchTerm = document.getElementById('searchAchievements').value.toLowerCase();
+    const categoryFilter = document.getElementById('filterCategory').value;
+    const rows = document.querySelectorAll('#achievementsTableBody tr');
+    
+    rows.forEach(row => {
+        const title = row.dataset.title || '';
+        const description = row.dataset.description || '';
+        const category = row.dataset.category || '';
+        
+        const matchesSearch = title.includes(searchTerm) || description.includes(searchTerm);
+        const matchesCategory = !categoryFilter || category === categoryFilter;
+        
+        row.style.display = (matchesSearch && matchesCategory) ? '' : 'none';
+    });
+}
+
+function resetAchievementFilters() {
+    document.getElementById('searchAchievements').value = '';
+    document.getElementById('filterCategory').value = '';
+    filterAchievements();
 }
 </script>
 

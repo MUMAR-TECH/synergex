@@ -85,9 +85,20 @@ include 'includes/admin_header.php';
 <div class="alert alert-error"><?php echo $error; ?></div>
 <?php endif; ?>
 
-<div style="display: grid; gap: 2rem;">
+<!-- Search -->
+<div style="background: white; padding: 1.5rem; border-radius: 10px; margin-bottom: 1.5rem; box-shadow: 0 2px 10px rgba(0,0,0,0.05);">
+    <div class="form-group" style="margin-bottom: 0;">
+        <label for="searchContent">Search Content</label>
+        <input type="text" id="searchContent" placeholder="Search by page, section, or content..." 
+               onkeyup="filterContent()" style="margin-bottom: 0;">
+    </div>
+</div>
+
+<div style="display: grid; gap: 2rem;" id="contentSections">
     <?php foreach ($availablePages as $page): ?>
-    <div style="background: white; padding: 2rem; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.05);">
+    <div class="content-page-section" 
+         data-page="<?php echo strtolower($page); ?>"
+         style="background: white; padding: 2rem; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.05);">
         <h2 style="text-transform: capitalize; margin-bottom: 1.5rem; color: var(--primary-blue);">
             <?php echo str_replace('-', ' ', $page); ?> Page
         </h2>
@@ -105,7 +116,8 @@ include 'includes/admin_header.php';
                 </thead>
                 <tbody>
                     <?php foreach ($contentByPage[$page] as $content): ?>
-                    <tr>
+                    <tr data-section="<?php echo strtolower(htmlspecialchars($content['section_name'])); ?>"
+                        data-content="<?php echo strtolower(htmlspecialchars(strip_tags($content['content']))); ?>">
                         <td><strong><?php echo ucfirst(str_replace('_', ' ', $content['section_name'])); ?></strong></td>
                         <td>
                             <div style="max-width: 400px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
@@ -254,6 +266,34 @@ window.onclick = function(event) {
     if (event.target == modal) {
         closeModal();
     }
+}
+
+// Search Function
+function filterContent() {
+    const searchTerm = document.getElementById('searchContent').value.toLowerCase();
+    const sections = document.querySelectorAll('.content-page-section');
+    const rows = document.querySelectorAll('.content-page-section tbody tr');
+    
+    sections.forEach(section => {
+        const page = section.dataset.page || '';
+        let hasVisibleRows = false;
+        
+        const sectionRows = section.querySelectorAll('tbody tr');
+        sectionRows.forEach(row => {
+            const sectionName = row.dataset.section || '';
+            const content = row.dataset.content || '';
+            
+            const matchesSearch = page.includes(searchTerm) || 
+                                 sectionName.includes(searchTerm) || 
+                                 content.includes(searchTerm);
+            
+            row.style.display = matchesSearch ? '' : 'none';
+            if (matchesSearch) hasVisibleRows = true;
+        });
+        
+        // Show/hide entire section based on whether it has visible rows
+        section.style.display = (hasVisibleRows || !searchTerm) ? '' : 'none';
+    });
 }
 </script>
 

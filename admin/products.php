@@ -76,6 +76,28 @@ include 'includes/admin_header.php';
 <div class="alert alert-error"><?php echo $error; ?></div>
 <?php endif; ?>
 
+<!-- Search and Filter -->
+<div style="background: white; padding: 1.5rem; border-radius: 10px; margin-bottom: 1.5rem; box-shadow: 0 2px 10px rgba(0,0,0,0.05);">
+    <div style="display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 1rem; align-items: end;">
+        <div class="form-group" style="margin-bottom: 0;">
+            <label for="searchProducts">Search Products</label>
+            <input type="text" id="searchProducts" placeholder="Search by name, description..." 
+                   onkeyup="filterProducts()" style="margin-bottom: 0;">
+        </div>
+        <div class="form-group" style="margin-bottom: 0;">
+            <label for="filterStatus">Filter by Status</label>
+            <select id="filterStatus" onchange="filterProducts()" style="margin-bottom: 0;">
+                <option value="">All Status</option>
+                <option value="active">Active</option>
+                <option value="inactive">Inactive</option>
+            </select>
+        </div>
+        <div>
+            <button class="btn btn-secondary" onclick="resetFilters()">Reset Filters</button>
+        </div>
+    </div>
+</div>
+
 <div class="table-responsive">
     <table class="data-table">
         <thead>
@@ -88,9 +110,11 @@ include 'includes/admin_header.php';
                 <th>Actions</th>
             </tr>
         </thead>
-        <tbody>
+        <tbody id="productsTableBody">
             <?php foreach ($products as $product): ?>
-            <tr>
+            <tr data-name="<?php echo strtolower(htmlspecialchars($product['name'])); ?>" 
+                data-description="<?php echo strtolower(htmlspecialchars($product['description'] ?? '')); ?>"
+                data-status="<?php echo $product['is_active'] ? 'active' : 'inactive'; ?>">
                 <td>
                     <?php if ($product['image']): ?>
                     <img src="<?php echo UPLOAD_URL . $product['image']; ?>" alt="<?php echo htmlspecialchars($product['name']); ?>" style="width: 60px; height: 60px; object-fit: cover; border-radius: 5px;">
@@ -290,6 +314,30 @@ window.onclick = function(event) {
     if (event.target == modal) {
         closeModal();
     }
+}
+
+// Search and Filter Functions
+function filterProducts() {
+    const searchTerm = document.getElementById('searchProducts').value.toLowerCase();
+    const statusFilter = document.getElementById('filterStatus').value;
+    const rows = document.querySelectorAll('#productsTableBody tr');
+    
+    rows.forEach(row => {
+        const name = row.dataset.name || '';
+        const description = row.dataset.description || '';
+        const status = row.dataset.status || '';
+        
+        const matchesSearch = name.includes(searchTerm) || description.includes(searchTerm);
+        const matchesStatus = !statusFilter || status === statusFilter;
+        
+        row.style.display = (matchesSearch && matchesStatus) ? '' : 'none';
+    });
+}
+
+function resetFilters() {
+    document.getElementById('searchProducts').value = '';
+    document.getElementById('filterStatus').value = '';
+    filterProducts();
 }
 </script>
 
