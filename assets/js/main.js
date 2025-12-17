@@ -2,8 +2,101 @@
 // SYNERGEX SOLUTIONS - MAIN JAVASCRIPT
 // ============================================================================
 
+// Hero Slider Functionality
+let currentSlide = 0;
+let slideInterval;
+
+function initHeroSlider() {
+    const slides = document.querySelectorAll('.hero-slide');
+    const indicators = document.querySelectorAll('.indicator');
+    
+    if (slides.length <= 1) return; // No need for slider if only one slide
+    
+    // Auto-advance slides every 5 seconds
+    slideInterval = setInterval(() => {
+        changeSlide(1);
+    }, 5000);
+    
+    // Pause on hover
+    const slider = document.querySelector('.hero-slider');
+    if (slider) {
+        slider.addEventListener('mouseenter', () => {
+            clearInterval(slideInterval);
+        });
+        
+        slider.addEventListener('mouseleave', () => {
+            slideInterval = setInterval(() => {
+                changeSlide(1);
+            }, 5000);
+        });
+    }
+}
+
+function changeSlide(direction) {
+    const slides = document.querySelectorAll('.hero-slide');
+    const indicators = document.querySelectorAll('.indicator');
+    
+    if (slides.length === 0) return;
+    
+    slides[currentSlide].classList.remove('active');
+    if (indicators[currentSlide]) {
+        indicators[currentSlide].classList.remove('active');
+    }
+    
+    currentSlide += direction;
+    
+    if (currentSlide >= slides.length) {
+        currentSlide = 0;
+    } else if (currentSlide < 0) {
+        currentSlide = slides.length - 1;
+    }
+    
+    slides[currentSlide].classList.add('active');
+    if (indicators[currentSlide]) {
+        indicators[currentSlide].classList.add('active');
+    }
+    
+    // Reset auto-advance timer
+    clearInterval(slideInterval);
+    slideInterval = setInterval(() => {
+        changeSlide(1);
+    }, 5000);
+}
+
+function goToSlide(index) {
+    const slides = document.querySelectorAll('.hero-slide');
+    const indicators = document.querySelectorAll('.indicator');
+    
+    if (index < 0 || index >= slides.length) return;
+    
+    slides[currentSlide].classList.remove('active');
+    if (indicators[currentSlide]) {
+        indicators[currentSlide].classList.remove('active');
+    }
+    
+    currentSlide = index;
+    
+    slides[currentSlide].classList.add('active');
+    if (indicators[currentSlide]) {
+        indicators[currentSlide].classList.add('active');
+    }
+    
+    // Reset auto-advance timer
+    clearInterval(slideInterval);
+    slideInterval = setInterval(() => {
+        changeSlide(1);
+    }, 5000);
+}
+
+// Make functions globally available
+window.changeSlide = changeSlide;
+window.goToSlide = goToSlide;
+
 // Mobile Menu Toggle
 document.addEventListener('DOMContentLoaded', function() {
+    // Initialize hero slider
+    initHeroSlider();
+    
     const mobileToggle = document.getElementById('mobileToggle');
     const navMenu = document.getElementById('navMenu');
     

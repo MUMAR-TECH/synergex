@@ -41,6 +41,9 @@ $currentPage = basename($_SERVER['PHP_SELF'], '.php');
                 <a href="messages.php" class="nav-item <?php echo $currentPage == 'messages' ? 'active' : ''; ?>">
                     <span>✉️</span> Messages
                 </a>
+                <a href="hero-slider.php" class="nav-item <?php echo $currentPage == 'hero-slider' ? 'active' : ''; ?>">
+                    <span>🖼️</span> Hero Slider
+                </a>
                 <a href="gallery.php" class="nav-item <?php echo $currentPage == 'gallery' ? 'active' : ''; ?>">
                     <span>🖼️</span> Gallery
                 </a>

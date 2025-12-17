@@ -78,6 +78,16 @@ function getPartners($activeOnly = true) {
     return $db->fetchAll($sql);
 }
 
+function getHeroSlides($activeOnly = true) {
+    $db = Database::getInstance();
+    $sql = "SELECT * FROM hero_slider";
+    if ($activeOnly) {
+        $sql .= " WHERE is_active = 1";
+    }
+    $sql .= " ORDER BY display_order ASC, created_at DESC";
+    return $db->fetchAll($sql);
+}
+
 function sanitizeInput($data) {
     $data = trim($data);
     $data = stripslashes($data);

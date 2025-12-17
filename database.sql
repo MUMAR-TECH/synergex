@@ -9,7 +9,7 @@ USE synergex_db;
 -- ============================================================================
 -- ADMIN USERS TABLE
 -- ============================================================================
-CREATE TABLE admin_users (
+CREATE TABLE IF NOT EXISTS admin_users (
     id INT AUTO_INCREMENT PRIMARY KEY,
     email VARCHAR(255) UNIQUE NOT NULL,
     password VARCHAR(255) NOT NULL,
@@ -25,7 +25,7 @@ INSERT INTO admin_users (email, password, name) VALUES
 -- ============================================================================
 -- SITE SETTINGS TABLE
 -- ============================================================================
-CREATE TABLE site_settings (
+CREATE TABLE IF NOT EXISTS site_settings (
     id INT AUTO_INCREMENT PRIMARY KEY,
     setting_key VARCHAR(100) UNIQUE NOT NULL,
     setting_value TEXT,
@@ -47,7 +47,7 @@ INSERT INTO site_settings (setting_key, setting_value) VALUES
 -- ============================================================================
 -- IMPACT STATISTICS TABLE
 -- ============================================================================
-CREATE TABLE impact_stats (
+CREATE TABLE IF NOT EXISTS impact_stats (
     id INT AUTO_INCREMENT PRIMARY KEY,
     plastic_recycled INT DEFAULT 0 COMMENT 'Kilograms of plastic recycled',
     eco_pavers_produced INT DEFAULT 0 COMMENT 'Number of eco-pavers produced',
@@ -63,7 +63,7 @@ VALUES (5000, 10000, 25, 150);
 -- ============================================================================
 -- PRODUCTS TABLE
 -- ============================================================================
-CREATE TABLE products (
+CREATE TABLE IF NOT EXISTS products (
     id INT AUTO_INCREMENT PRIMARY KEY,
     name VARCHAR(255) NOT NULL,
     description TEXT,
@@ -86,7 +86,7 @@ INSERT INTO products (name, description, price, unit, features, is_active) VALUE
 -- ============================================================================
 -- GALLERY TABLE
 -- ============================================================================
-CREATE TABLE gallery (
+CREATE TABLE IF NOT EXISTS gallery (
     id INT AUTO_INCREMENT PRIMARY KEY,
     title VARCHAR(255) NOT NULL,
     category VARCHAR(100) COMMENT 'waste_collection, recycling, production, installation, community',
@@ -101,7 +101,7 @@ CREATE TABLE gallery (
 -- ============================================================================
 -- ACHIEVEMENTS TABLE
 -- ============================================================================
-CREATE TABLE achievements (
+CREATE TABLE IF NOT EXISTS achievements (
     id INT AUTO_INCREMENT PRIMARY KEY,
     year INT NOT NULL,
     title VARCHAR(255) NOT NULL,
@@ -124,7 +124,7 @@ INSERT INTO achievements (year, title, description, category, display_order) VAL
 -- ============================================================================
 -- QUOTE REQUESTS TABLE
 -- ============================================================================
-CREATE TABLE quote_requests (
+CREATE TABLE IF NOT EXISTS quote_requests (
     id INT AUTO_INCREMENT PRIMARY KEY,
     name VARCHAR(255) NOT NULL,
     email VARCHAR(255) NOT NULL,
@@ -143,7 +143,7 @@ CREATE TABLE quote_requests (
 -- ============================================================================
 -- CONTACT MESSAGES TABLE
 -- ============================================================================
-CREATE TABLE contact_messages (
+CREATE TABLE IF NOT EXISTS contact_messages (
     id INT AUTO_INCREMENT PRIMARY KEY,
     name VARCHAR(255) NOT NULL,
     email VARCHAR(255) NOT NULL,
@@ -158,7 +158,7 @@ CREATE TABLE contact_messages (
 -- ============================================================================
 -- NEWSLETTER SUBSCRIBERS TABLE
 -- ============================================================================
-CREATE TABLE subscribers (
+CREATE TABLE IF NOT EXISTS subscribers (
     id INT AUTO_INCREMENT PRIMARY KEY,
     email VARCHAR(255) UNIQUE NOT NULL,
     name VARCHAR(255),
@@ -171,7 +171,7 @@ CREATE TABLE subscribers (
 -- ============================================================================
 -- PARTNERS TABLE
 -- ============================================================================
-CREATE TABLE partners (
+CREATE TABLE IF NOT EXISTS partners (
     id INT AUTO_INCREMENT PRIMARY KEY,
     name VARCHAR(255) NOT NULL,
     logo VARCHAR(255),
@@ -190,7 +190,7 @@ INSERT INTO partners (name, display_order, is_active) VALUES
 -- ============================================================================
 -- PAGE CONTENT TABLE (for dynamic content management)
 -- ============================================================================
-CREATE TABLE page_content (
+CREATE TABLE IF NOT EXISTS page_content (
     id INT AUTO_INCREMENT PRIMARY KEY,
     page_name VARCHAR(100) NOT NULL COMMENT 'home, about, what-we-do, vision-sdgs',
     section_name VARCHAR(100) NOT NULL COMMENT 'hero, mission, values, approach, etc.',

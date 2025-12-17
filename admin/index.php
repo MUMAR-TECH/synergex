@@ -180,6 +180,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         </form>
         
         <div class="back-link">
+            <a href="setup.php">Create Admin Account</a> | 
             <a href="<?php echo SITE_URL; ?>">← Back to Website</a>
         </div>
     </div>

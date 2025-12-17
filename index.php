@@ -8,19 +8,65 @@ $stats = getImpactStats();
 $products = getProducts(true);
 $partners = getPartners(true);
 $mission = getSetting('mission', 'Creating sustainable value from waste through innovation and community engagement');
+$heroSlides = getHeroSlides(true);
 ?>
 
-<!-- Hero Section -->
-<section class="hero">
-    <div class="container">
-        <h1 class="fade-in"><?php echo $siteName; ?></h1>
-        <p class="tagline fade-in"><?php echo $tagline; ?></p>
-        <p class="mission fade-in"><?php echo $mission; ?></p>
-        <div class="hero-buttons fade-in">
-            <a href="<?php echo SITE_URL; ?>/products.php" class="btn btn-primary">Get a Quote</a>
-            <a href="<?php echo SITE_URL; ?>/achievements.php" class="btn btn-secondary">Explore Our Impact</a>
+<!-- Hero Slider Section -->
+<section class="hero-slider-section">
+    <?php if (!empty($heroSlides)): ?>
+    <div class="hero-slider">
+        <?php foreach ($heroSlides as $index => $slide): ?>
+        <div class="hero-slide <?php echo $index === 0 ? 'active' : ''; ?>" 
+             style="background-image: url('<?php echo UPLOAD_URL . $slide['image']; ?>');">
+            <div class="hero-overlay"></div>
+            <div class="container">
+                <div class="hero-content">
+                    <?php if ($slide['title']): ?>
+                    <h1 class="fade-in"><?php echo htmlspecialchars($slide['title']); ?></h1>
+                    <?php endif; ?>
+                    <?php if ($slide['subtitle']): ?>
+                    <p class="tagline fade-in"><?php echo htmlspecialchars($slide['subtitle']); ?></p>
+                    <?php endif; ?>
+                    <?php if ($slide['button_text'] && $slide['button_link']): ?>
+                    <div class="hero-buttons fade-in">
+                        <a href="<?php echo htmlspecialchars($slide['button_link']); ?>" class="btn btn-primary">
+                            <?php echo htmlspecialchars($slide['button_text']); ?>
+                        </a>
+                    </div>
+                    <?php endif; ?>
+                </div>
+            </div>
         </div>
+        <?php endforeach; ?>
+        
+        <!-- Slider Controls -->
+        <?php if (count($heroSlides) > 1): ?>
+        <button class="slider-btn slider-prev" onclick="changeSlide(-1)">❮</button>
+        <button class="slider-btn slider-next" onclick="changeSlide(1)">❯</button>
+        
+        <!-- Slider Indicators -->
+        <div class="slider-indicators">
+            <?php foreach ($heroSlides as $index => $slide): ?>
+            <span class="indicator <?php echo $index === 0 ? 'active' : ''; ?>" 
+                  onclick="goToSlide(<?php echo $index; ?>)"></span>
+            <?php endforeach; ?>
+        </div>
+        <?php endif; ?>
     </div>
+    <?php else: ?>
+    <!-- Fallback Hero Section (if no slides) -->
+    <section class="hero">
+        <div class="container">
+            <h1 class="fade-in"><?php echo $siteName; ?></h1>
+            <p class="tagline fade-in"><?php echo $tagline; ?></p>
+            <p class="mission fade-in"><?php echo $mission; ?></p>
+            <div class="hero-buttons fade-in">
+                <a href="<?php echo SITE_URL; ?>/products.php" class="btn btn-primary">Get a Quote</a>
+                <a href="<?php echo SITE_URL; ?>/achievements.php" class="btn btn-secondary">Explore Our Impact</a>
+            </div>
+        </div>
+    </section>
+    <?php endif; ?>
 </section>
 
 <!-- Impact Statistics Section -->
