@@ -26,7 +26,7 @@ $products = getProducts(true);
             <?php endif; ?>
             
             <div class="product-content">
-                <h3><?php echo htmlspecialchars($product['name']); ?></h3>
+                <h3><a href="product-details.php?id=<?php echo $product['id']; ?>" style="color: inherit; text-decoration: none;"><?php echo htmlspecialchars($product['name']); ?></a></h3>
                 <p><?php echo htmlspecialchars($product['description']); ?></p>
                 <div class="product-price">K<?php echo number_format($product['price'], 2); ?> <span style="font-size: 0.9rem; color: var(--text-dark);"><?php echo htmlspecialchars($product['unit']); ?></span></div>
                 

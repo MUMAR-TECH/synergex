@@ -36,13 +36,9 @@ $galleryImages = getGallery($selectedCategory);
     <div class="gallery-grid">
         <?php foreach ($galleryImages as $image): ?>
         <div class="gallery-item fade-in">
-            <img src="<?php echo UPLOAD_URL . $image['image']; ?>" alt="<?php echo htmlspecialchars($image['title']); ?>">
-            <div class="gallery-caption">
-                <h4><?php echo htmlspecialchars($image['title']); ?></h4>
-                <?php if ($image['caption']): ?>
-                <p><?php echo htmlspecialchars($image['caption']); ?></p>
-                <?php endif; ?>
-            </div>
+            <a href="gallery-details.php?id=<?php echo $image['id']; ?>">
+                <img src="<?php echo UPLOAD_URL . $image['image']; ?>" alt="<?php echo htmlspecialchars($image['title']); ?>">
+            </a>
         </div>
         <?php endforeach; ?>
     </div>

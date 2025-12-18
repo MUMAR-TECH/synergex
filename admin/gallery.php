@@ -9,9 +9,19 @@ $db = Database::getInstance();
 $success = '';
 $error = '';
 
+// Temporary debugging
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    error_log("POST received: " . print_r($_POST, true));
+    error_log("FILES received: " . print_r($_FILES, true));
+}
+
 // Handle form submissions
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (isset($_POST['action'])) {
+        // Verify CSRF token
+        if (!isset($_POST['csrf_token']) || !verifyCSRFToken($_POST['csrf_token'])) {
+            $error = 'Invalid security token. Please try again.';
+        } else {
         switch ($_POST['action']) {
             case 'add':
             case 'edit':
@@ -28,13 +38,26 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 ];
                 
                 // Handle image upload
+                $imageUploaded = false;
                 if (isset($_FILES['image']) && $_FILES['image']['error'] === UPLOAD_ERR_OK) {
                     $upload = uploadImage($_FILES['image'], 'gallery');
                     if ($upload['success']) {
                         $data['image'] = $upload['filename'];
+                        $imageUploaded = true;
                     } else {
                         $error = $upload['message'];
                     }
+                } elseif (isset($_FILES['image']) && $_FILES['image']['error'] !== UPLOAD_ERR_NO_FILE) {
+                    // Handle file upload errors other than no file
+                    $uploadErrors = [
+                        UPLOAD_ERR_INI_SIZE => 'File is too large (exceeds upload_max_filesize)',
+                        UPLOAD_ERR_FORM_SIZE => 'File is too large (exceeds MAX_FILE_SIZE)',
+                        UPLOAD_ERR_PARTIAL => 'File was only partially uploaded',
+                        UPLOAD_ERR_NO_TMP_DIR => 'Missing temporary folder',
+                        UPLOAD_ERR_CANT_WRITE => 'Failed to write file to disk',
+                        UPLOAD_ERR_EXTENSION => 'File upload stopped by extension'
+                    ];
+                    $error = $uploadErrors[$_FILES['image']['error']] ?? 'Unknown upload error';
                 }
                 
                 if (empty($error)) {
@@ -46,12 +69,22 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                             $error = 'Please upload an image';
                         }
                     } else {
+                        // Edit action
                         $id = intval($_POST['id']);
-                        if (empty($data['image'])) {
+                        
+                        // If a new image was uploaded, delete the old one
+                        if ($imageUploaded) {
+                            $oldImage = $db->fetchOne("SELECT image FROM gallery WHERE id = ?", [$id]);
+                            if ($oldImage && file_exists(UPLOAD_PATH . $oldImage['image'])) {
+                                unlink(UPLOAD_PATH . $oldImage['image']);
+                            }
+                        } else {
+                            // If no new image uploaded, don't update the image field
                             unset($data['image']);
                         }
+                        
                         $db->update('gallery', $data, 'id = ?', [$id]);
-                        $success = 'Image updated successfully';
+                        $success = 'Gallery item updated successfully';
                     }
                 }
                 break;
@@ -65,6 +98,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $db->delete('gallery', 'id = ?', [$id]);
                 $success = 'Image deleted successfully';
                 break;
+        }
         }
     }
 }
@@ -149,6 +183,7 @@ include 'includes/admin_header.php';
         <form id="imageForm" method="POST" enctype="multipart/form-data">
             <input type="hidden" name="action" id="formAction" value="add">
             <input type="hidden" name="id" id="imageId">
+            <input type="hidden" name="csrf_token" value="<?php echo generateCSRFToken(); ?>">
             
             <div class="form-group">
                 <label for="title">Title *</label>
@@ -178,8 +213,9 @@ include 'includes/admin_header.php';
             </div>
             
             <div class="form-group">
-                <label for="image">Image *</label>
+                <label for="image">Image <span id="imageRequired">*</span></label>
                 <input type="file" id="image" name="image" accept="image/*">
+                <small class="form-help">Supported formats: JPG, JPEG, PNG, GIF, WEBP. Max size: 5MB</small>
                 <div id="imagePreview"></div>
             </div>
             
@@ -236,6 +272,13 @@ include 'includes/admin_header.php';
     max-height: 300px;
     border-radius: 5px;
 }
+
+.form-help {
+    font-size: 0.85rem;
+    color: #666;
+    margin-top: 0.25rem;
+    display: block;
+}
 </style>
 
 <script>
@@ -245,10 +288,13 @@ function showAddModal() {
     document.getElementById('imageForm').reset();
     document.getElementById('imagePreview').innerHTML = '';
     document.getElementById('image').required = true;
+    document.getElementById('imageRequired').style.display = '';
     document.getElementById('imageModal').style.display = 'block';
 }
 
 function editImage(image) {
+    console.log('EditImage called with:', image);
+    
     document.getElementById('modalTitle').textContent = 'Edit Image';
     document.getElementById('formAction').value = 'edit';
     document.getElementById('imageId').value = image.id;
@@ -257,9 +303,16 @@ function editImage(image) {
     document.getElementById('caption').value = image.caption || '';
     document.getElementById('display_order').value = image.display_order;
     document.getElementById('image').required = false;
+    document.getElementById('imageRequired').style.display = 'none';
+    
+    console.log('Form fields populated, showing modal');
     
     document.getElementById('imagePreview').innerHTML = 
-        `<img src="<?php echo UPLOAD_URL; ?>${image.image}" alt="Current image">`;
+        `<div style="margin-top: 1rem;">
+            <strong>Current Image:</strong><br>
+            <img src="<?php echo UPLOAD_URL; ?>${image.image}" alt="Current image" style="max-width: 200px; max-height: 200px; border-radius: 5px; margin-top: 0.5rem;">
+            <br><small>Leave image field empty to keep current image, or select a new image to replace it.</small>
+         </div>`;
     
     document.getElementById('imageModal').style.display = 'block';
 }
@@ -283,13 +336,54 @@ function closeModal() {
 
 document.getElementById('image').addEventListener('change', function(e) {
     const file = e.target.files[0];
+    const previewDiv = document.getElementById('imagePreview');
+    
     if (file) {
         const reader = new FileReader();
         reader.onload = function(e) {
-            document.getElementById('imagePreview').innerHTML = 
-                `<img src="${e.target.result}" alt="Preview" style="max-width: 100%; max-height: 300px; border-radius: 5px;">`;
+            const formAction = document.getElementById('formAction').value;
+            if (formAction === 'edit') {
+                previewDiv.innerHTML = `
+                    <div style="margin-top: 1rem;">
+                        <strong>New Image Preview:</strong><br>
+                        <img src="${e.target.result}" alt="New image preview" style="max-width: 200px; max-height: 200px; border-radius: 5px; margin-top: 0.5rem;">
+                        <br><small style="color: #ff6600;">This will replace the current image when you save.</small>
+                    </div>`;
+            } else {
+                previewDiv.innerHTML = `
+                    <div style="margin-top: 1rem;">
+                        <img src="${e.target.result}" alt="Image preview" style="max-width: 200px; max-height: 200px; border-radius: 5px;">
+                    </div>`;
+            }
         };
         reader.readAsDataURL(file);
+    } else {
+        // If file is cleared and we're editing, show the original image again
+        const formAction = document.getElementById('formAction').value;
+        if (formAction === 'edit') {
+            const imageId = document.getElementById('imageId').value;
+            // Find the original image data from the page
+            const imageItems = document.querySelectorAll('.image-item');
+            let originalImage = null;
+            imageItems.forEach(item => {
+                const editButton = item.querySelector('[onclick*="editImage"]');
+                if (editButton && editButton.onclick.toString().includes(imageId)) {
+                    const imgSrc = item.querySelector('img').src;
+                    originalImage = imgSrc;
+                }
+            });
+            
+            if (originalImage) {
+                previewDiv.innerHTML = `
+                    <div style="margin-top: 1rem;">
+                        <strong>Current Image:</strong><br>
+                        <img src="${originalImage}" alt="Current image" style="max-width: 200px; max-height: 200px; border-radius: 5px; margin-top: 0.5rem;">
+                        <br><small>Leave image field empty to keep current image, or select a new image to replace it.</small>
+                    </div>`;
+            }
+        } else {
+            previewDiv.innerHTML = '';
+        }
     }
 });
 
@@ -299,6 +393,12 @@ window.onclick = function(event) {
         closeModal();
     }
 }
+
+// Add form submission debugging
+document.getElementById('imageForm').addEventListener('submit', function(e) {
+    console.log('Form submitted with action:', document.getElementById('formAction').value);
+    console.log('Form data:', new FormData(this));
+});
 
 // Search and Filter Functions
 function filterGallery() {

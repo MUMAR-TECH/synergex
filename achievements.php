@@ -24,7 +24,7 @@ $achievements = getAchievements();
         <div class="timeline-item fade-in">
             <div class="timeline-year"><?php echo $achievement['year']; ?></div>
             <div class="timeline-content">
-                <h3><?php echo htmlspecialchars($achievement['title']); ?></h3>
+                <h3><a href="achievement-details.php?id=<?php echo $achievement['id']; ?>"><?php echo htmlspecialchars($achievement['title']); ?></a></h3>
                 <p><?php echo htmlspecialchars($achievement['description']); ?></p>
                 <?php if ($achievement['image']): ?>
                 <img src="<?php echo UPLOAD_URL . $achievement['image']; ?>" alt="<?php echo htmlspecialchars($achievement['title']); ?>" class="timeline-image">

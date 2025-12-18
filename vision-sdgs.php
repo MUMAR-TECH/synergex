@@ -1,4 +1,3 @@
-
 <?php
 // ============================================================================
 // FILE: vision-sdgs.php - Vision & SDG Alignment Page
@@ -16,7 +15,7 @@ $vision = getSetting('vision', 'A cleaner, greener Zambia where waste is transfo
 
 <section class="container">
     <div class="fade-in" style="text-align: center; max-width: 800px; margin: 0 auto 4rem;">
-        <h2>Our Vision</h2>
+        <h2><a href="vision-details.php?id=1">Our Vision</a></h2>
         <p style="font-size: 1.2rem; line-height: 1.8;"><?php echo htmlspecialchars($vision); ?></p>
     </div>
     
