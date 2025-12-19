@@ -3,58 +3,26 @@
 // FILE: admin/products.php - Product Management
 // ============================================================================
 require_once __DIR__ . '/../includes/functions.php';
+require_once __DIR__ . '/includes/admin_utilities.php';
 requireLogin();
 
 $db = Database::getInstance();
 $success = '';
 $error = '';
 
-// Handle form submissions
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    if (isset($_POST['action'])) {
-        switch ($_POST['action']) {
-            case 'add':
-            case 'edit':
-                $name = sanitizeInput($_POST['name']);
-                $description = sanitizeInput($_POST['description']);
-                $price = floatval($_POST['price']);
-                $unit = sanitizeInput($_POST['unit']);
-                $features = sanitizeInput($_POST['features']);
-                $isActive = isset($_POST['is_active']) ? 1 : 0;
-                
-                $data = [
-                    'name' => $name,
-                    'description' => $description,
-                    'price' => $price,
-                    'unit' => $unit,
-                    'features' => $features,
-                    'is_active' => $isActive
-                ];
-                
-                // Handle image upload
-                if (isset($_FILES['image']) && $_FILES['image']['error'] === UPLOAD_ERR_OK) {
-                    $upload = uploadImage($_FILES['image'], 'product');
-                    if ($upload['success']) {
-                        $data['image'] = $upload['filename'];
-                    }
-                }
-                
-                if ($_POST['action'] === 'add') {
-                    $db->insert('products', $data);
-                    $success = 'Product added successfully';
-                } else {
-                    $id = intval($_POST['id']);
-                    $db->update('products', $data, 'id = ?', [$id]);
-                    $success = 'Product updated successfully';
-                }
-                break;
-                
-            case 'delete':
-                $id = intval($_POST['id']);
-                $db->delete('products', 'id = ?', [$id]);
-                $success = 'Product deleted successfully';
-                break;
-        }
+// Handle form submissions using standardized system
+$result = handleAdminFormSubmission(
+    'products',
+    ['name', 'description'], // required fields
+    ['price', 'unit', 'features', 'is_active'], // optional fields
+    'image' // image field
+);
+
+if ($result['action']) {
+    if ($result['success']) {
+        $success = $result['message'];
+    } else {
+        $error = $result['message'];
     }
 }
 

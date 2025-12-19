@@ -102,21 +102,34 @@ function uploadImage($file, $prefix = 'img') {
         mkdir($targetDir, 0777, true);
     }
     
-    $imageFileType = strtolower(pathinfo($file["name"], PATHINFO_EXTENSION));
-    $newFileName = $prefix . '_' . time() . '_' . uniqid() . '.' . $imageFileType;
+    $fileType = strtolower(pathinfo($file["name"], PATHINFO_EXTENSION));
+    $newFileName = $prefix . '_' . time() . '_' . uniqid() . '.' . $fileType;
     $targetFile = $targetDir . $newFileName;
     
-    $check = getimagesize($file["tmp_name"]);
-    if ($check === false) {
-        return ['success' => false, 'message' => 'File is not an image.'];
+    // Check if it's a video or image
+    $videoExtensions = ['mp4', 'webm', 'ogg', 'avi', 'mov'];
+    $imageExtensions = ['jpg', 'jpeg', 'png', 'gif', 'webp'];
+    
+    $isVideo = in_array($fileType, $videoExtensions);
+    $isImage = in_array($fileType, $imageExtensions);
+    
+    if (!$isVideo && !$isImage) {
+        return ['success' => false, 'message' => 'Invalid file type. Allowed: Images (JPG, PNG, GIF, WEBP) or Videos (MP4, WEBM, OGG).'];
     }
     
-    if ($file["size"] > 5000000) {
-        return ['success' => false, 'message' => 'File is too large. Max 5MB.'];
+    // Validate image files with getimagesize
+    if ($isImage) {
+        $check = getimagesize($file["tmp_name"]);
+        if ($check === false) {
+            return ['success' => false, 'message' => 'File is not a valid image.'];
+        }
     }
     
-    if (!in_array($imageFileType, ['jpg', 'jpeg', 'png', 'gif', 'webp'])) {
-        return ['success' => false, 'message' => 'Only JPG, JPEG, PNG, GIF & WEBP files allowed.'];
+    // Check file size - 50MB max for videos, 5MB for images
+    $maxSize = $isVideo ? 50000000 : 5000000;
+    if ($file["size"] > $maxSize) {
+        $maxSizeMB = $isVideo ? '50MB' : '5MB';
+        return ['success' => false, 'message' => "File is too large. Max {$maxSizeMB}."];
     }
     
     if (move_uploaded_file($file["tmp_name"], $targetFile)) {

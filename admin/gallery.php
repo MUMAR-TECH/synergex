@@ -3,114 +3,113 @@
 // FILE: admin/gallery.php - Gallery Management
 // ============================================================================
 require_once __DIR__ . '/../includes/functions.php';
+require_once __DIR__ . '/includes/admin_utilities.php';
 requireLogin();
 
 $db = Database::getInstance();
 $success = '';
 $error = '';
 
-// Temporary debugging
+// Handle form submissions using standardized system
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    error_log("POST received: " . print_r($_POST, true));
-    error_log("FILES received: " . print_r($_FILES, true));
+    error_log("Gallery POST request received: " . print_r($_POST, true));
 }
 
-// Handle form submissions
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    if (isset($_POST['action'])) {
-        // Verify CSRF token
-        if (!isset($_POST['csrf_token']) || !verifyCSRFToken($_POST['csrf_token'])) {
-            $error = 'Invalid security token. Please try again.';
-        } else {
-        switch ($_POST['action']) {
-            case 'add':
-            case 'edit':
-                $title = sanitizeInput($_POST['title']);
-                $category = sanitizeInput($_POST['category']);
-                $caption = sanitizeInput($_POST['caption']);
-                $displayOrder = intval($_POST['display_order']);
-                
-                $data = [
-                    'title' => $title,
-                    'category' => $category,
-                    'caption' => $caption,
-                    'display_order' => $displayOrder
-                ];
-                
-                // Handle image upload
-                $imageUploaded = false;
-                if (isset($_FILES['image']) && $_FILES['image']['error'] === UPLOAD_ERR_OK) {
-                    $upload = uploadImage($_FILES['image'], 'gallery');
-                    if ($upload['success']) {
-                        $data['image'] = $upload['filename'];
-                        $imageUploaded = true;
-                    } else {
-                        $error = $upload['message'];
-                    }
-                } elseif (isset($_FILES['image']) && $_FILES['image']['error'] !== UPLOAD_ERR_NO_FILE) {
-                    // Handle file upload errors other than no file
-                    $uploadErrors = [
-                        UPLOAD_ERR_INI_SIZE => 'File is too large (exceeds upload_max_filesize)',
-                        UPLOAD_ERR_FORM_SIZE => 'File is too large (exceeds MAX_FILE_SIZE)',
-                        UPLOAD_ERR_PARTIAL => 'File was only partially uploaded',
-                        UPLOAD_ERR_NO_TMP_DIR => 'Missing temporary folder',
-                        UPLOAD_ERR_CANT_WRITE => 'Failed to write file to disk',
-                        UPLOAD_ERR_EXTENSION => 'File upload stopped by extension'
-                    ];
-                    $error = $uploadErrors[$_FILES['image']['error']] ?? 'Unknown upload error';
-                }
-                
-                if (empty($error)) {
-                    if ($_POST['action'] === 'add') {
-                        if (!empty($data['image'])) {
-                            $db->insert('gallery', $data);
-                            $success = 'Image added successfully';
-                        } else {
-                            $error = 'Please upload an image';
-                        }
-                    } else {
-                        // Edit action
-                        $id = intval($_POST['id']);
-                        
-                        // If a new image was uploaded, delete the old one
-                        if ($imageUploaded) {
-                            $oldImage = $db->fetchOne("SELECT image FROM gallery WHERE id = ?", [$id]);
-                            if ($oldImage && file_exists(UPLOAD_PATH . $oldImage['image'])) {
-                                unlink(UPLOAD_PATH . $oldImage['image']);
-                            }
-                        } else {
-                            // If no new image uploaded, don't update the image field
-                            unset($data['image']);
-                        }
-                        
-                        $db->update('gallery', $data, 'id = ?', [$id]);
-                        $success = 'Gallery item updated successfully';
-                    }
-                }
-                break;
-                
-            case 'delete':
-                $id = intval($_POST['id']);
-                $image = $db->fetchOne("SELECT image FROM gallery WHERE id = ?", [$id]);
-                if ($image && file_exists(UPLOAD_PATH . $image['image'])) {
-                    unlink(UPLOAD_PATH . $image['image']);
-                }
-                $db->delete('gallery', 'id = ?', [$id]);
-                $success = 'Image deleted successfully';
-                break;
-        }
-        }
+$result = handleAdminFormSubmission(
+    'gallery',
+    ['title', 'category', 'media_type'], // required fields
+    ['caption', 'display_order'], // optional fields
+    'image' // image field
+);
+
+if ($result['action']) {
+    error_log("Gallery form result: " . print_r($result, true));
+    if ($result['success']) {
+        $success = $result['message'];
+    } else {
+        $error = $result['message'];
     }
 }
 
 $galleryImages = $db->fetchAll("SELECT * FROM gallery ORDER BY category, display_order ASC, created_at DESC");
+
+// Function to clean up orphaned files
+function cleanOrphanedGalleryFiles($db) {
+    $dbImages = $db->fetchAll("SELECT image FROM gallery");
+    $dbImageFiles = array_column($dbImages, 'image');
+    
+    $uploadDir = UPLOAD_PATH;
+    if (is_dir($uploadDir)) {
+        $files = array_diff(scandir($uploadDir), ['.', '..']);
+        $galleryFiles = array_filter($files, function($file) {
+            return strpos($file, 'gallery_') === 0;
+        });
+        
+        foreach ($galleryFiles as $file) {
+            if (!in_array($file, $dbImageFiles)) {
+                $filePath = $uploadDir . $file;
+                error_log("Found orphaned gallery file: $file");
+                if (unlink($filePath)) {
+                    error_log("Deleted orphaned file: $file");
+                }
+            }
+        }
+    }
+}
+
+// Uncomment the next line to clean orphaned files on page load (for testing)
+// cleanOrphanedGalleryFiles($db);
+
+// Add a repair button for admin to fix file mismatches
+if (isset($_GET['repair_files']) && $_GET['repair_files'] === 'true') {
+    $repairedCount = 0;
+    $galleryItems = $db->fetchAll("SELECT id, image FROM gallery");
+    
+    foreach ($galleryItems as $item) {
+        $imagePath = UPLOAD_PATH . $item['image'];
+        if (!file_exists($imagePath)) {
+            // Try to find a matching file by similar pattern
+            $uploadDir = UPLOAD_PATH;
+            if (is_dir($uploadDir)) {
+                $files = array_diff(scandir($uploadDir), ['.', '..']);
+                $galleryFiles = array_filter($files, function($file) {
+                    return strpos($file, 'gallery_') === 0;
+                });
+                
+                // Look for orphaned files that might match this record
+                foreach ($galleryFiles as $file) {
+                    $fileInDb = $db->fetchOne("SELECT id FROM gallery WHERE image = ?", [$file]);
+                    if (!$fileInDb) {
+                        // This is an orphaned file, associate it with this record
+                        $db->update('gallery', ['image' => $file], 'id = ?', [$item['id']]);
+                        $repairedCount++;
+                        error_log("Repaired gallery item {$item['id']}: changed {$item['image']} to {$file}");
+                        break;
+                    }
+                }
+            }
+        }
+    }
+    
+    if ($repairedCount > 0) {
+        $success = "Repaired $repairedCount gallery items with missing images.";
+    } else {
+        $success = "No repairs needed - all gallery images are properly linked.";
+    }
+    
+    // Refresh the data after repair
+    $galleryImages = $db->fetchAll("SELECT * FROM gallery ORDER BY category, display_order ASC, created_at DESC");
+}
 
 include 'includes/admin_header.php';
 ?>
 
 <div class="page-header">
     <h1>Gallery Management</h1>
-    <button class="btn btn-primary" onclick="showAddModal()">+ Add New Image</button>
+    <div>
+        <button class="btn btn-primary" onclick="showAddModal()">+ Add New Image</button>
+        <a href="?repair_files=true" class="btn btn-secondary" onclick="return confirm('This will attempt to fix image file mismatches. Continue?')" style="margin-left: 10px;">🔧 Repair Files</a>
+    </div>
 </div>
 
 <?php if ($success): ?>
@@ -147,16 +146,40 @@ include 'includes/admin_header.php';
 </div>
 
 <div class="image-grid" id="galleryGrid">
-    <?php foreach ($galleryImages as $image): ?>
+    <?php foreach ($galleryImages as $image): 
+        $imagePath = UPLOAD_PATH . $image['image'];
+        $imageExists = file_exists($imagePath);
+        if (!$imageExists) {
+            error_log("Missing image file for gallery ID {$image['id']}: {$image['image']}");
+        }
+    ?>
     <div class="image-item" 
          data-title="<?php echo strtolower(htmlspecialchars($image['title'])); ?>"
          data-caption="<?php echo strtolower(htmlspecialchars($image['caption'] ?? '')); ?>"
          data-category="<?php echo $image['category']; ?>">
-        <img src="<?php echo UPLOAD_URL . $image['image']; ?>" alt="<?php echo htmlspecialchars($image['title']); ?>">
+        <?php if ($imageExists): ?>
+            <?php 
+            $isVideo = isset($image['media_type']) && $image['media_type'] === 'video';
+            if ($isVideo): ?>
+                <video src="<?php echo UPLOAD_URL . $image['image']; ?>" muted style="width: 100%; height: 200px; object-fit: cover; border-radius: 5px;"></video>
+                <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background: rgba(255,102,0,0.8); width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; pointer-events: none;">
+                    <span style="color: white; font-size: 16px; margin-left: 2px;">▶</span>
+                </div>
+            <?php else: ?>
+                <img src="<?php echo UPLOAD_URL . $image['image']; ?>" alt="<?php echo htmlspecialchars($image['title']); ?>">
+            <?php endif; ?>
+        <?php else: ?>
+            <div style="width: 100%; height: 200px; background: #f0f0f0; display: flex; align-items: center; justify-content: center; color: #666; border-radius: 5px;">
+                <span>❌ Media not found<br><small><?php echo htmlspecialchars($image['image']); ?></small></span>
+            </div>
+        <?php endif; ?>
         <div class="image-actions">
             <div>
                 <strong><?php echo htmlspecialchars($image['title']); ?></strong><br>
-                <small><?php echo ucfirst($image['category']); ?></small>
+                <small><?php echo ucfirst($image['category']); ?> • <?php echo isset($image['media_type']) ? ucfirst($image['media_type']) : 'Image'; ?></small>
+                <?php if (!$imageExists): ?>
+                    <br><small style="color: red;">File missing</small>
+                <?php endif; ?>
             </div>
             <div>
                 <button class="btn-icon" onclick='editImage(<?php echo json_encode($image); ?>)' title="Edit">✏️</button>
@@ -203,6 +226,14 @@ include 'includes/admin_header.php';
             </div>
             
             <div class="form-group">
+                <label for="media_type">Media Type *</label>
+                <select id="media_type" name="media_type" required onchange="updateMediaInputAccept()">
+                    <option value="image">Image</option>
+                    <option value="video">Video</option>
+                </select>
+            </div>
+            
+            <div class="form-group">
                 <label for="caption">Caption</label>
                 <textarea id="caption" name="caption" rows="2"></textarea>
             </div>
@@ -213,9 +244,9 @@ include 'includes/admin_header.php';
             </div>
             
             <div class="form-group">
-                <label for="image">Image <span id="imageRequired">*</span></label>
-                <input type="file" id="image" name="image" accept="image/*">
-                <small class="form-help">Supported formats: JPG, JPEG, PNG, GIF, WEBP. Max size: 5MB</small>
+                <label for="image"><span id="mediaLabel">Image</span> <span id="imageRequired">*</span></label>
+                <input type="file" id="image" name="image" accept="image/*,video/*">
+                <small class="form-help" id="mediaHelp">Images: JPG, PNG, GIF, WEBP | Videos: MP4, WEBM, OGG. Max size: 50MB</small>
                 <div id="imagePreview"></div>
             </div>
             
@@ -283,38 +314,71 @@ include 'includes/admin_header.php';
 
 <script>
 function showAddModal() {
-    document.getElementById('modalTitle').textContent = 'Add New Image';
+    document.getElementById('modalTitle').textContent = 'Add New Media';
     document.getElementById('formAction').value = 'add';
     document.getElementById('imageForm').reset();
     document.getElementById('imagePreview').innerHTML = '';
     document.getElementById('image').required = true;
-    document.getElementById('imageRequired').style.display = '';
+    document.getElementById('imageRequired').textContent = '*';
+    document.getElementById('media_type').value = 'image';
+    document.getElementById('mediaLabel').textContent = 'Image';
+    updateMediaInputAccept();
     document.getElementById('imageModal').style.display = 'block';
 }
 
 function editImage(image) {
     console.log('EditImage called with:', image);
     
-    document.getElementById('modalTitle').textContent = 'Edit Image';
+    const isVideo = image.media_type === 'video';
+    document.getElementById('modalTitle').textContent = isVideo ? 'Edit Video' : 'Edit Image';
     document.getElementById('formAction').value = 'edit';
     document.getElementById('imageId').value = image.id;
     document.getElementById('title').value = image.title;
     document.getElementById('category').value = image.category || '';
     document.getElementById('caption').value = image.caption || '';
     document.getElementById('display_order').value = image.display_order;
+    document.getElementById('media_type').value = image.media_type || 'image';
+    document.getElementById('mediaLabel').textContent = isVideo ? 'Video' : 'Image';
     document.getElementById('image').required = false;
-    document.getElementById('imageRequired').style.display = 'none';
+    document.getElementById('imageRequired').textContent = '(optional)';
     
     console.log('Form fields populated, showing modal');
     
-    document.getElementById('imagePreview').innerHTML = 
-        `<div style="margin-top: 1rem;">
-            <strong>Current Image:</strong><br>
-            <img src="<?php echo UPLOAD_URL; ?>${image.image}" alt="Current image" style="max-width: 200px; max-height: 200px; border-radius: 5px; margin-top: 0.5rem;">
-            <br><small>Leave image field empty to keep current image, or select a new image to replace it.</small>
-         </div>`;
+    if (isVideo) {
+        document.getElementById('imagePreview').innerHTML = 
+            `<div style="margin-top: 1rem;">
+                <strong>Current Video:</strong><br>
+                <video src="<?php echo UPLOAD_URL; ?>${image.image}" controls style="max-width: 300px; max-height: 200px; border-radius: 5px; margin-top: 0.5rem;"></video>
+                <br><small>Leave media field empty to keep current video, or select a new file to replace it.</small>
+             </div>`;
+    } else {
+        document.getElementById('imagePreview').innerHTML = 
+            `<div style="margin-top: 1rem;">
+                <strong>Current Image:</strong><br>
+                <img src="<?php echo UPLOAD_URL; ?>${image.image}" alt="Current image" style="max-width: 200px; max-height: 200px; border-radius: 5px; margin-top: 0.5rem;">
+                <br><small>Leave media field empty to keep current image, or select a new file to replace it.</small>
+             </div>`;
+    }
     
+    updateMediaInputAccept();
     document.getElementById('imageModal').style.display = 'block';
+}
+
+function updateMediaInputAccept() {
+    const mediaType = document.getElementById('media_type').value;
+    const fileInput = document.getElementById('image');
+    const mediaLabel = document.getElementById('mediaLabel');
+    const mediaHelp = document.getElementById('mediaHelp');
+    
+    if (mediaType === 'video') {
+        fileInput.accept = 'video/*';
+        mediaLabel.textContent = 'Video';
+        mediaHelp.textContent = 'Supported formats: MP4, WEBM, OGG. Max size: 50MB';
+    } else {
+        fileInput.accept = 'image/*';
+        mediaLabel.textContent = 'Image';
+        mediaHelp.textContent = 'Supported formats: JPG, PNG, GIF, WEBP. Max size: 50MB';
+    }
 }
 
 function deleteImage(id) {
@@ -324,6 +388,7 @@ function deleteImage(id) {
         form.innerHTML = `
             <input type="hidden" name="action" value="delete">
             <input type="hidden" name="id" value="${id}">
+            <input type="hidden" name="csrf_token" value="<?php echo generateCSRFToken(); ?>">
         `;
         document.body.appendChild(form);
         form.submit();
@@ -337,48 +402,73 @@ function closeModal() {
 document.getElementById('image').addEventListener('change', function(e) {
     const file = e.target.files[0];
     const previewDiv = document.getElementById('imagePreview');
+    const mediaType = document.getElementById('media_type').value;
     
     if (file) {
         const reader = new FileReader();
         reader.onload = function(e) {
             const formAction = document.getElementById('formAction').value;
+            const isVideo = file.type.startsWith('video/');
+            
+            let previewHTML = '';
+            if (isVideo) {
+                previewHTML = `<video src="${e.target.result}" controls style="max-width: 300px; max-height: 200px; border-radius: 5px; margin-top: 0.5rem;"></video>`;
+            } else {
+                previewHTML = `<img src="${e.target.result}" alt="Preview" style="max-width: 200px; max-height: 200px; border-radius: 5px; margin-top: 0.5rem;">`;
+            }
+            
             if (formAction === 'edit') {
                 previewDiv.innerHTML = `
                     <div style="margin-top: 1rem;">
-                        <strong>New Image Preview:</strong><br>
-                        <img src="${e.target.result}" alt="New image preview" style="max-width: 200px; max-height: 200px; border-radius: 5px; margin-top: 0.5rem;">
-                        <br><small style="color: #ff6600;">This will replace the current image when you save.</small>
+                        <strong>New ${isVideo ? 'Video' : 'Image'} Preview:</strong><br>
+                        ${previewHTML}
+                        <br><small style="color: #ff6600;">This will replace the current ${mediaType} when you save.</small>
                     </div>`;
             } else {
                 previewDiv.innerHTML = `
                     <div style="margin-top: 1rem;">
-                        <img src="${e.target.result}" alt="Image preview" style="max-width: 200px; max-height: 200px; border-radius: 5px;">
+                        ${previewHTML}
                     </div>`;
             }
         };
         reader.readAsDataURL(file);
     } else {
-        // If file is cleared and we're editing, show the original image again
+        // If file is cleared and we're editing, show the original media again
         const formAction = document.getElementById('formAction').value;
         if (formAction === 'edit') {
             const imageId = document.getElementById('imageId').value;
-            // Find the original image data from the page
             const imageItems = document.querySelectorAll('.image-item');
-            let originalImage = null;
+            let originalMedia = null;
+            let isOriginalVideo = false;
+            
             imageItems.forEach(item => {
                 const editButton = item.querySelector('[onclick*="editImage"]');
-                if (editButton && editButton.onclick.toString().includes(imageId)) {
-                    const imgSrc = item.querySelector('img').src;
-                    originalImage = imgSrc;
+                if (editButton) {
+                    const onclickStr = editButton.getAttribute('onclick');
+                    if (onclickStr && onclickStr.includes('"id":' + imageId)) {
+                        const video = item.querySelector('video');
+                        const img = item.querySelector('img');
+                        if (video) {
+                            originalMedia = video.src;
+                            isOriginalVideo = true;
+                        } else if (img) {
+                            originalMedia = img.src;
+                            isOriginalVideo = false;
+                        }
+                    }
                 }
             });
             
-            if (originalImage) {
+            if (originalMedia) {
+                const mediaHTML = isOriginalVideo 
+                    ? `<video src="${originalMedia}" controls style="max-width: 300px; max-height: 200px; border-radius: 5px; margin-top: 0.5rem;"></video>`
+                    : `<img src="${originalMedia}" alt="Current" style="max-width: 200px; max-height: 200px; border-radius: 5px; margin-top: 0.5rem;">`;
+                
                 previewDiv.innerHTML = `
                     <div style="margin-top: 1rem;">
-                        <strong>Current Image:</strong><br>
-                        <img src="${originalImage}" alt="Current image" style="max-width: 200px; max-height: 200px; border-radius: 5px; margin-top: 0.5rem;">
-                        <br><small>Leave image field empty to keep current image, or select a new image to replace it.</small>
+                        <strong>Current ${isOriginalVideo ? 'Video' : 'Image'}:</strong><br>
+                        ${mediaHTML}
+                        <br><small>Leave media field empty to keep current ${isOriginalVideo ? 'video' : 'image'}, or select a new file to replace it.</small>
                     </div>`;
             }
         } else {

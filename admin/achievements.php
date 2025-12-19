@@ -3,61 +3,26 @@
 // FILE: admin/achievements.php - Achievements Management
 // ============================================================================
 require_once __DIR__ . '/../includes/functions.php';
+require_once __DIR__ . '/includes/admin_utilities.php';
 requireLogin();
 
 $db = Database::getInstance();
 $success = '';
 $error = '';
 
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    if (isset($_POST['action'])) {
-        switch ($_POST['action']) {
-            case 'add':
-            case 'edit':
-                $year = intval($_POST['year']);
-                $title = sanitizeInput($_POST['title']);
-                $description = sanitizeInput($_POST['description']);
-                $category = sanitizeInput($_POST['category']);
-                $displayOrder = intval($_POST['display_order']);
-                
-                $data = [
-                    'year' => $year,
-                    'title' => $title,
-                    'description' => $description,
-                    'category' => $category,
-                    'display_order' => $displayOrder
-                ];
-                
-                if (isset($_FILES['image']) && $_FILES['image']['error'] === UPLOAD_ERR_OK) {
-                    $upload = uploadImage($_FILES['image'], 'achievement');
-                    if ($upload['success']) {
-                        $data['image'] = $upload['filename'];
-                    }
-                }
-                
-                if ($_POST['action'] === 'add') {
-                    $db->insert('achievements', $data);
-                    $success = 'Achievement added successfully';
-                } else {
-                    $id = intval($_POST['id']);
-                    if (empty($data['image'])) {
-                        unset($data['image']);
-                    }
-                    $db->update('achievements', $data, 'id = ?', [$id]);
-                    $success = 'Achievement updated successfully';
-                }
-                break;
-                
-            case 'delete':
-                $id = intval($_POST['id']);
-                $achievement = $db->fetchOne("SELECT image FROM achievements WHERE id = ?", [$id]);
-                if ($achievement && $achievement['image'] && file_exists(UPLOAD_PATH . $achievement['image'])) {
-                    unlink(UPLOAD_PATH . $achievement['image']);
-                }
-                $db->delete('achievements', 'id = ?', [$id]);
-                $success = 'Achievement deleted successfully';
-                break;
-        }
+// Handle form submissions using standardized system
+$result = handleAdminFormSubmission(
+    'achievements',
+    ['year', 'title', 'description'], // required fields
+    ['category', 'display_order'], // optional fields
+    'image' // image field
+);
+
+if ($result['action']) {
+    if ($result['success']) {
+        $success = $result['message'];
+    } else {
+        $error = $result['message'];
     }
 }
 

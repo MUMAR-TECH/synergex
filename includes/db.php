@@ -35,11 +35,16 @@ class Database {
 
     public function query($sql, $params = []) {
         try {
+            error_log("Executing SQL: " . $sql);
+            error_log("With params: " . print_r($params, true));
             $stmt = $this->conn->prepare($sql);
-            $stmt->execute($params);
+            $result = $stmt->execute($params);
+            error_log("Query execution result: " . ($result ? 'SUCCESS' : 'FAILED'));
             return $stmt;
         } catch(PDOException $e) {
             error_log("Database Error: " . $e->getMessage());
+            error_log("Failed SQL: " . $sql);
+            error_log("Failed params: " . print_r($params, true));
             return false;
         }
     }
@@ -59,9 +64,12 @@ class Database {
         $placeholders = ':' . implode(', :', array_keys($data));
         
         $sql = "INSERT INTO $table ($fields) VALUES ($placeholders)";
-        $this->query($sql, $data);
+        $stmt = $this->query($sql, $data);
         
-        return $this->conn->lastInsertId();
+        if ($stmt) {
+            return $this->conn->lastInsertId();
+        }
+        return false;
     }
 
     public function update($table, $data, $where, $whereParams = []) {
@@ -72,12 +80,14 @@ class Database {
         $setString = implode(', ', $set);
         
         $sql = "UPDATE $table SET $setString WHERE $where";
-        return $this->query($sql, array_merge($data, $whereParams));
+        $stmt = $this->query($sql, array_merge($data, $whereParams));
+        return $stmt !== false;
     }
 
     public function delete($table, $where, $params = []) {
         $sql = "DELETE FROM $table WHERE $where";
-        return $this->query($sql, $params);
+        $stmt = $this->query($sql, $params);
+        return $stmt !== false;
     }
 }
 ?>
