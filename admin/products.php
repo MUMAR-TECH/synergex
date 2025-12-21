@@ -117,6 +117,7 @@ include 'includes/admin_header.php';
         <form id="productForm" method="POST" enctype="multipart/form-data">
             <input type="hidden" name="action" id="formAction" value="add">
             <input type="hidden" name="id" id="productId">
+            <input type="hidden" name="csrf_token" value="<?php echo generateCSRFToken(); ?>">
             
             <div class="form-group">
                 <label for="name">Product Name *</label>
@@ -253,6 +254,7 @@ function deleteProduct(id) {
         form.innerHTML = `
             <input type="hidden" name="action" value="delete">
             <input type="hidden" name="id" value="${id}">
+            <input type="hidden" name="csrf_token" value="<?php echo generateCSRFToken(); ?>">
         `;
         document.body.appendChild(form);
         form.submit();

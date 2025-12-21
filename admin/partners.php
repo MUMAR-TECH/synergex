@@ -3,65 +3,26 @@
 // FILE: admin/partners.php - Partners Management
 // ============================================================================
 require_once __DIR__ . '/../includes/functions.php';
+require_once __DIR__ . '/includes/admin_utilities.php';
 requireLogin();
 
 $db = Database::getInstance();
 $success = '';
 $error = '';
 
-// Handle form submissions
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    if (isset($_POST['action'])) {
-        switch ($_POST['action']) {
-            case 'add':
-            case 'edit':
-                $name = sanitizeInput($_POST['name'] ?? '');
-                $website = sanitizeInput($_POST['website'] ?? '');
-                $displayOrder = intval($_POST['display_order'] ?? 0);
-                $isActive = isset($_POST['is_active']) ? 1 : 0;
-                
-                $data = [
-                    'name' => $name,
-                    'website' => $website,
-                    'display_order' => $displayOrder,
-                    'is_active' => $isActive
-                ];
-                
-                // Handle logo upload
-                if (isset($_FILES['logo']) && $_FILES['logo']['error'] === UPLOAD_ERR_OK) {
-                    $upload = uploadImage($_FILES['logo'], 'partner');
-                    if ($upload['success']) {
-                        $data['logo'] = $upload['filename'];
-                    } else {
-                        $error = $upload['message'];
-                    }
-                }
-                
-                if (empty($error)) {
-                    if ($_POST['action'] === 'add') {
-                        $db->insert('partners', $data);
-                        $success = 'Partner added successfully';
-                    } else {
-                        $id = intval($_POST['id']);
-                        if (empty($data['logo'])) {
-                            unset($data['logo']);
-                        }
-                        $db->update('partners', $data, 'id = ?', [$id]);
-                        $success = 'Partner updated successfully';
-                    }
-                }
-                break;
-                
-            case 'delete':
-                $id = intval($_POST['id']);
-                $partner = $db->fetchOne("SELECT logo FROM partners WHERE id = ?", [$id]);
-                if ($partner && !empty($partner['logo']) && file_exists(UPLOAD_PATH . $partner['logo'])) {
-                    unlink(UPLOAD_PATH . $partner['logo']);
-                }
-                $db->delete('partners', 'id = ?', [$id]);
-                $success = 'Partner deleted successfully';
-                break;
-        }
+// Handle form submissions using standardized system
+$result = handleAdminFormSubmission(
+    'partners',
+    ['name'], // required fields
+    ['website', 'display_order', 'is_active'], // optional fields
+    'logo' // image field
+);
+
+if ($result['action']) {
+    if ($result['success']) {
+        $success = $result['message'];
+    } else {
+        $error = $result['message'];
     }
 }
 
@@ -171,6 +132,7 @@ include 'includes/admin_header.php';
         <form id="partnerForm" method="POST" enctype="multipart/form-data">
             <input type="hidden" name="action" id="formAction" value="add">
             <input type="hidden" name="id" id="partnerId">
+            <input type="hidden" name="csrf_token" value="<?php echo generateCSRFToken(); ?>">
             
             <div class="form-group">
                 <label for="name">Partner Name *</label>
@@ -300,6 +262,7 @@ function deletePartner(id) {
         form.innerHTML = `
             <input type="hidden" name="action" value="delete">
             <input type="hidden" name="id" value="${id}">
+            <input type="hidden" name="csrf_token" value="<?php echo generateCSRFToken(); ?>">
         `;
         document.body.appendChild(form);
         form.submit();

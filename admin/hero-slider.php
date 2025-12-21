@@ -3,73 +3,26 @@
 // FILE: admin/hero-slider.php - Hero Slider Management
 // ============================================================================
 require_once __DIR__ . '/../includes/functions.php';
+require_once __DIR__ . '/includes/admin_utilities.php';
 requireLogin();
 
 $db = Database::getInstance();
 $success = '';
 $error = '';
 
-// Handle form submissions
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    if (isset($_POST['action'])) {
-        switch ($_POST['action']) {
-            case 'add':
-            case 'edit':
-                $title = sanitizeInput($_POST['title'] ?? '');
-                $subtitle = sanitizeInput($_POST['subtitle'] ?? '');
-                $buttonText = sanitizeInput($_POST['button_text'] ?? '');
-                $buttonLink = sanitizeInput($_POST['button_link'] ?? '');
-                $displayOrder = intval($_POST['display_order'] ?? 0);
-                $isActive = isset($_POST['is_active']) ? 1 : 0;
-                
-                $data = [
-                    'title' => $title,
-                    'subtitle' => $subtitle,
-                    'button_text' => $buttonText,
-                    'button_link' => $buttonLink,
-                    'display_order' => $displayOrder,
-                    'is_active' => $isActive
-                ];
-                
-                // Handle image upload
-                if (isset($_FILES['image']) && $_FILES['image']['error'] === UPLOAD_ERR_OK) {
-                    $upload = uploadImage($_FILES['image'], 'hero');
-                    if ($upload['success']) {
-                        $data['image'] = $upload['filename'];
-                    } else {
-                        $error = $upload['message'];
-                    }
-                }
-                
-                if (empty($error)) {
-                    if ($_POST['action'] === 'add') {
-                        if (!empty($data['image'])) {
-                            $db->insert('hero_slider', $data);
-                            $success = 'Hero slide added successfully';
-                        } else {
-                            $error = 'Please upload an image';
-                        }
-                    } else {
-                        $id = intval($_POST['id']);
-                        if (empty($data['image'])) {
-                            unset($data['image']);
-                        }
-                        $db->update('hero_slider', $data, 'id = ?', [$id]);
-                        $success = 'Hero slide updated successfully';
-                    }
-                }
-                break;
-                
-            case 'delete':
-                $id = intval($_POST['id']);
-                $slide = $db->fetchOne("SELECT image FROM hero_slider WHERE id = ?", [$id]);
-                if ($slide && !empty($slide['image']) && file_exists(UPLOAD_PATH . $slide['image'])) {
-                    unlink(UPLOAD_PATH . $slide['image']);
-                }
-                $db->delete('hero_slider', 'id = ?', [$id]);
-                $success = 'Hero slide deleted successfully';
-                break;
-        }
+// Handle form submissions using standardized system
+$result = handleAdminFormSubmission(
+    'hero_slider',
+    ['title'], // required fields
+    ['subtitle', 'button_text', 'button_link', 'display_order', 'is_active'], // optional fields
+    'image' // image field
+);
+
+if ($result['action']) {
+    if ($result['success']) {
+        $success = $result['message'];
+    } else {
+        $error = $result['message'];
     }
 }
 
@@ -173,6 +126,7 @@ include 'includes/admin_header.php';
         <form id="slideForm" method="POST" enctype="multipart/form-data">
             <input type="hidden" name="action" id="formAction" value="add">
             <input type="hidden" name="id" id="slideId">
+            <input type="hidden" name="csrf_token" value="<?php echo generateCSRFToken(); ?>">
             
             <div class="form-group">
                 <label for="title">Title *</label>
@@ -316,6 +270,7 @@ function deleteSlide(id) {
         form.innerHTML = `
             <input type="hidden" name="action" value="delete">
             <input type="hidden" name="id" value="${id}">
+            <input type="hidden" name="csrf_token" value="<?php echo generateCSRFToken(); ?>">
         `;
         document.body.appendChild(form);
         form.submit();

@@ -70,8 +70,8 @@ include 'includes/admin_header.php';
                 <td><?php echo htmlspecialchars($quote['name']); ?></td>
                 <td>
                     <small>
-                        📧 <?php echo htmlspecialchars($quote['email']); ?><br>
-                        📞 <?php echo htmlspecialchars($quote['phone']); ?>
+                        <i class="fas fa-envelope"></i> <?php echo htmlspecialchars($quote['email']); ?><br>
+                        <i class="fas fa-phone"></i> <?php echo htmlspecialchars($quote['phone']); ?>
                     </small>
                 </td>
                 <td><?php echo htmlspecialchars($quote['product_name'] ?? 'N/A'); ?></td>
@@ -186,8 +186,8 @@ function viewQuote(quote) {
             <strong>Date:</strong> ${new Date(quote.created_at).toLocaleString()}
         </div>
         <div style="margin-top: 1.5rem;">
-            <a href="mailto:${quote.email}" class="btn btn-primary">📧 Send Email</a>
-            <a href="https://wa.me/${quote.phone}?text=Hello ${quote.name}, regarding your quote request..." class="btn btn-secondary" target="_blank">💬 WhatsApp</a>
+            <a href="mailto:${quote.email}" class="btn btn-primary"><i class="fas fa-envelope"></i> Send Email</a>
+            <a href="https://wa.me/${quote.phone}?text=Hello ${quote.name}, regarding your quote request..." class="btn btn-secondary" target="_blank"><i class="fab fa-whatsapp"></i> WhatsApp</a>
         </div>
     `;
     

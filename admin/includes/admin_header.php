@@ -16,57 +16,64 @@ $currentPage = basename($_SERVER['PHP_SELF'], '.php');
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Montserrat:wght@600;700&display=swap" rel="stylesheet">
+    
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    
     <link rel="stylesheet" href="<?php echo SITE_URL; ?>/assets/css/admin.css">
 </head>
 <body>
     <div class="admin-layout">
         <aside class="sidebar">
             <div class="sidebar-header">
-                <h2>Synergex Admin</h2>
+                <h2><i class="fas fa-leaf"></i> Synergex Admin</h2>
                 <p style="font-size: 0.85rem; opacity: 0.8; margin-top: 0.5rem;">
-                    <?php echo htmlspecialchars($_SESSION['admin_name']); ?>
+                    <i class="fas fa-user-circle"></i> <?php echo htmlspecialchars($_SESSION['admin_name']); ?>
                 </p>
             </div>
             
             <nav class="sidebar-nav">
                 <a href="dashboard.php" class="nav-item <?php echo $currentPage == 'dashboard' ? 'active' : ''; ?>">
-                    <span>📊</span> Dashboard
+                    <i class="fas fa-chart-line"></i> Dashboard
                 </a>
                 <a href="products.php" class="nav-item <?php echo $currentPage == 'products' ? 'active' : ''; ?>">
-                    <span>📦</span> Products
+                    <i class="fas fa-box"></i> Products
                 </a>
                 <a href="quotes.php" class="nav-item <?php echo $currentPage == 'quotes' ? 'active' : ''; ?>">
-                    <span>📋</span> Quote Requests
+                    <i class="fas fa-clipboard-list"></i> Quote Requests
                 </a>
                 <a href="messages.php" class="nav-item <?php echo $currentPage == 'messages' ? 'active' : ''; ?>">
-                    <span>✉️</span> Messages
+                    <i class="fas fa-envelope"></i> Messages
                 </a>
                 <a href="hero-slider.php" class="nav-item <?php echo $currentPage == 'hero-slider' ? 'active' : ''; ?>">
-                    <span>🖼️</span> Hero Slider
+                    <i class="fas fa-images"></i> Hero Slider
                 </a>
                 <a href="gallery.php" class="nav-item <?php echo $currentPage == 'gallery' ? 'active' : ''; ?>">
-                    <span>🖼️</span> Gallery
+                    <i class="fas fa-photo-video"></i> Gallery
                 </a>
                 <a href="achievements.php" class="nav-item <?php echo $currentPage == 'achievements' ? 'active' : ''; ?>">
-                    <span>🏆</span> Achievements
+                    <i class="fas fa-trophy"></i> Achievements
                 </a>
                 <a href="partners.php" class="nav-item <?php echo $currentPage == 'partners' ? 'active' : ''; ?>">
-                    <span>🤝</span> Partners
+                    <i class="fas fa-handshake"></i> Partners
                 </a>
                 <a href="content.php" class="nav-item <?php echo $currentPage == 'content' ? 'active' : ''; ?>">
-                    <span>📝</span> Page Content
+                    <i class="fas fa-file-alt"></i> Page Content
                 </a>
                 <a href="subscribers.php" class="nav-item <?php echo $currentPage == 'subscribers' ? 'active' : ''; ?>">
-                    <span>📧</span> Subscribers
+                    <i class="fas fa-users"></i> Subscribers
+                </a>
+                <a href="chatbot.php" class="nav-item <?php echo $currentPage == 'chatbot' ? 'active' : ''; ?>">
+                    <i class="fas fa-robot"></i> AI Chatbot
                 </a>
                 <a href="settings.php" class="nav-item <?php echo $currentPage == 'settings' ? 'active' : ''; ?>">
-                    <span>⚙️</span> Settings
+                    <i class="fas fa-cog"></i> Settings
                 </a>
                 <a href="<?php echo SITE_URL; ?>" class="nav-item" target="_blank">
-                    <span>🌐</span> View Website
+                    <i class="fas fa-external-link-alt"></i> View Website
                 </a>
                 <a href="logout.php" class="nav-item" onclick="return confirm('Are you sure you want to logout?')">
-                    <span>🚪</span> Logout
+                    <i class="fas fa-sign-out-alt"></i> Logout
                 </a>
             </nav>
         </aside>

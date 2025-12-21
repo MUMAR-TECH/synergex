@@ -35,14 +35,14 @@ include 'includes/admin_header.php';
     <!-- Statistics Cards -->
     <div class="stats-grid">
         <div class="stat-card">
-            <div class="stat-icon">📦</div>
+            <div class="stat-icon"><i class="fas fa-box"></i></div>
             <div class="stat-number"><?php echo $totalProducts; ?></div>
             <div class="stat-label">Products</div>
             <a href="products.php" class="stat-link">Manage →</a>
         </div>
         
         <div class="stat-card">
-            <div class="stat-icon">📋</div>
+            <div class="stat-icon"><i class="fas fa-clipboard-list"></i></div>
             <div class="stat-number"><?php echo $totalQuotes; ?></div>
             <div class="stat-label">Quote Requests</div>
             <?php if ($pendingQuotes > 0): ?>
@@ -52,7 +52,7 @@ include 'includes/admin_header.php';
         </div>
         
         <div class="stat-card">
-            <div class="stat-icon">✉️</div>
+            <div class="stat-icon"><i class="fas fa-envelope"></i></div>
             <div class="stat-number"><?php echo $totalMessages; ?></div>
             <div class="stat-label">Messages</div>
             <?php if ($unreadMessages > 0): ?>
@@ -62,21 +62,21 @@ include 'includes/admin_header.php';
         </div>
         
         <div class="stat-card">
-            <div class="stat-icon">📧</div>
+            <div class="stat-icon"><i class="fas fa-users"></i></div>
             <div class="stat-number"><?php echo $totalSubscribers; ?></div>
             <div class="stat-label">Subscribers</div>
             <a href="subscribers.php" class="stat-link">View →</a>
         </div>
         
         <div class="stat-card">
-            <div class="stat-icon">🖼️</div>
+            <div class="stat-icon"><i class="fas fa-images"></i></div>
             <div class="stat-number"><?php echo $totalGallery; ?></div>
             <div class="stat-label">Gallery Images</div>
             <a href="gallery.php" class="stat-link">Manage →</a>
         </div>
         
         <div class="stat-card">
-            <div class="stat-icon">🏆</div>
+            <div class="stat-icon"><i class="fas fa-trophy"></i></div>
             <div class="stat-number"><?php echo $totalAchievements; ?></div>
             <div class="stat-label">Achievements</div>
             <a href="achievements.php" class="stat-link">Manage →</a>

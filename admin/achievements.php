@@ -112,6 +112,7 @@ include 'includes/admin_header.php';
         <form id="achievementForm" method="POST" enctype="multipart/form-data">
             <input type="hidden" name="action" id="formAction" value="add">
             <input type="hidden" name="id" id="achievementId">
+            <input type="hidden" name="csrf_token" value="<?php echo generateCSRFToken(); ?>">
             
             <div class="form-row">
                 <div class="form-group">
@@ -199,6 +200,7 @@ function deleteAchievement(id) {
         form.innerHTML = `
             <input type="hidden" name="action" value="delete">
             <input type="hidden" name="id" value="${id}">
+            <input type="hidden" name="csrf_token" value="<?php echo generateCSRFToken(); ?>">
         `;
         document.body.appendChild(form);
         form.submit();

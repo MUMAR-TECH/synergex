@@ -38,13 +38,13 @@ include 'includes/admin_header.php';
 
 <div class="stats-grid" style="margin-bottom: 2rem;">
     <div class="stat-card">
-        <div class="stat-icon">📧</div>
+        <div class="stat-icon"><i class="fas fa-users"></i></div>
         <div class="stat-number"><?php echo count($subscribers); ?></div>
         <div class="stat-label">Total Subscribers</div>
     </div>
     
     <div class="stat-card">
-        <div class="stat-icon">✅</div>
+        <div class="stat-icon"><i class="fas fa-check-circle"></i></div>
         <div class="stat-number"><?php echo count(array_filter($subscribers, fn($s) => $s['status'] == 'active')); ?></div>
         <div class="stat-label">Active</div>
     </div>

@@ -41,8 +41,8 @@ $heroSlides = getHeroSlides(true);
         
         <!-- Slider Controls -->
         <?php if (count($heroSlides) > 1): ?>
-        <button class="slider-btn slider-prev" onclick="changeSlide(-1)">❮</button>
-        <button class="slider-btn slider-next" onclick="changeSlide(1)">❯</button>
+        <button class="slider-btn slider-prev" onclick="changeSlide(-1)"><i class="fas fa-chevron-left"></i></button>
+        <button class="slider-btn slider-next" onclick="changeSlide(1)"><i class="fas fa-chevron-right"></i></button>
         
         <!-- Slider Indicators -->
         <div class="slider-indicators">
@@ -61,8 +61,8 @@ $heroSlides = getHeroSlides(true);
             <p class="tagline fade-in"><?php echo $tagline; ?></p>
             <p class="mission fade-in"><?php echo $mission; ?></p>
             <div class="hero-buttons fade-in">
-                <a href="<?php echo SITE_URL; ?>/products.php" class="btn btn-primary">Get a Quote</a>
-                <a href="<?php echo SITE_URL; ?>/achievements.php" class="btn btn-secondary">Explore Our Impact</a>
+                <a href="<?php echo SITE_URL; ?>/products.php" class="btn btn-primary"><i class="fas fa-shopping-cart"></i> Get a Quote</a>
+                <a href="<?php echo SITE_URL; ?>/achievements.php" class="btn btn-secondary"><i class="fas fa-chart-line"></i> Explore Our Impact</a>
             </div>
         </div>
     </section>
@@ -75,25 +75,25 @@ $heroSlides = getHeroSlides(true);
         <h2 class="section-title">Our Impact</h2>
         <div class="impact-grid">
             <div class="impact-card fade-in">
-                <div class="impact-icon">♻️</div>
+                <div class="impact-icon"><i class="fas fa-recycle"></i></div>
                 <div class="impact-number"><?php echo formatNumber($stats['plastic_recycled']); ?></div>
                 <div class="impact-label">Kg of Plastic Recycled</div>
             </div>
             
             <div class="impact-card fade-in">
-                <div class="impact-icon">🧱</div>
+                <div class="impact-icon"><i class="fas fa-cube"></i></div>
                 <div class="impact-number"><?php echo formatNumber($stats['eco_pavers_produced']); ?></div>
                 <div class="impact-label">Eco-Pavers Produced</div>
             </div>
             
             <div class="impact-card fade-in">
-                <div class="impact-icon">🏫</div>
+                <div class="impact-icon"><i class="fas fa-building"></i></div>
                 <div class="impact-number"><?php echo formatNumber($stats['institutions_served']); ?></div>
                 <div class="impact-label">Institutions Served</div>
             </div>
             
             <div class="impact-card fade-in">
-                <div class="impact-icon">👷</div>
+                <div class="impact-icon"><i class="fas fa-users"></i></div>
                 <div class="impact-number"><?php echo formatNumber($stats['youths_engaged']); ?></div>
                 <div class="impact-label">Youths Engaged</div>
             </div>
@@ -106,27 +106,31 @@ $heroSlides = getHeroSlides(true);
     <h2 class="section-title">What We Do</h2>
     <div class="services-grid">
         <div class="service-card fade-in">
+            <div class="service-icon"><i class="fas fa-trash-alt"></i></div>
             <h3>Plastic Waste Management</h3>
             <p>Comprehensive waste collection and sorting services for communities and institutions across Zambia.</p>
-            <a href="<?php echo SITE_URL; ?>/what-we-do.php" class="btn btn-secondary">Learn More</a>
+            <a href="<?php echo SITE_URL; ?>/what-we-do.php" class="btn btn-secondary"><i class="fas fa-arrow-right"></i> Learn More</a>
         </div>
         
         <div class="service-card fade-in">
+            <div class="service-icon"><i class="fas fa-recycle"></i></div>
             <h3>Plastic Recycling</h3>
             <p>Advanced recycling processes that transform plastic waste into valuable raw materials for production.</p>
-            <a href="<?php echo SITE_URL; ?>/what-we-do.php" class="btn btn-secondary">Learn More</a>
+            <a href="<?php echo SITE_URL; ?>/what-we-do.php" class="btn btn-secondary"><i class="fas fa-arrow-right"></i> Learn More</a>
         </div>
         
         <div class="service-card fade-in">
+            <div class="service-icon"><i class="fas fa-cubes"></i></div>
             <h3>Eco-Friendly Pavers & Tiles</h3>
             <p>Durable, water-resistant pavers and tiles made from 100% recycled plastic materials.</p>
-            <a href="<?php echo SITE_URL; ?>/products.php" class="btn btn-primary">View Products</a>
+            <a href="<?php echo SITE_URL; ?>/products.php" class="btn btn-primary"><i class="fas fa-eye"></i> View Products</a>
         </div>
         
         <div class="service-card fade-in">
+            <div class="service-icon"><i class="fas fa-users"></i></div>
             <h3>Community Engagement</h3>
             <p>Educational programs and awareness campaigns promoting sustainability and waste management.</p>
-            <a href="<?php echo SITE_URL; ?>/what-we-do.php" class="btn btn-secondary">Learn More</a>
+            <a href="<?php echo SITE_URL; ?>/what-we-do.php" class="btn btn-secondary"><i class="fas fa-arrow-right"></i> Learn More</a>
         </div>
     </div>
 </section>
@@ -158,7 +162,7 @@ $heroSlides = getHeroSlides(true);
                 </ul>
                 <?php endif; ?>
                 
-                <a href="<?php echo SITE_URL; ?>/products.php" class="btn btn-primary">Get Quote</a>
+                <a href="<?php echo SITE_URL; ?>/products.php" class="btn btn-primary"><i class="fas fa-shopping-cart"></i> Get Quote</a>
             </div>
         </div>
         <?php endforeach; ?>
@@ -189,8 +193,8 @@ $heroSlides = getHeroSlides(true);
         <h2>Ready to Make a Difference?</h2>
         <p style="font-size: 1.2rem; margin-bottom: 2rem;">Join us in creating a cleaner, greener Zambia through sustainable waste management.</p>
         <div class="hero-buttons">
-            <a href="<?php echo SITE_URL; ?>/contact.php" class="btn btn-primary">Get in Touch</a>
-            <a href="<?php echo SITE_URL; ?>/products.php" class="btn btn-secondary">Request a Quote</a>
+            <a href="<?php echo SITE_URL; ?>/contact.php" class="btn btn-primary"><i class="fas fa-envelope"></i> Get in Touch</a>
+            <a href="<?php echo SITE_URL; ?>/products.php" class="btn btn-secondary"><i class="fas fa-file-invoice"></i> Request a Quote</a>
         </div>
     </div>
 </section>

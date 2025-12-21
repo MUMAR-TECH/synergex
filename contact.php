@@ -22,17 +22,17 @@ $phone = getSetting('phone', '0770377471');
             
             <div class="contact-info">
                 <div style="margin-bottom: 1.5rem;">
-                    <h3 style="font-size: 1.1rem; margin-bottom: 0.5rem;">📧 Email</h3>
+                    <h3 style="font-size: 1.1rem; margin-bottom: 0.5rem;"><i class="fas fa-envelope"></i> Email</h3>
                     <a href="mailto:<?php echo $email; ?>" style="color: var(--primary-orange);"><?php echo $email; ?></a>
                 </div>
                 
                 <div style="margin-bottom: 1.5rem;">
-                    <h3 style="font-size: 1.1rem; margin-bottom: 0.5rem;">📞 Phone</h3>
+                    <h3 style="font-size: 1.1rem; margin-bottom: 0.5rem;"><i class="fas fa-phone"></i> Phone</h3>
                     <a href="tel:<?php echo $phone; ?>" style="color: var(--primary-orange);"><?php echo $phone; ?></a>
                 </div>
                 
                 <div style="margin-bottom: 1.5rem;">
-                    <h3 style="font-size: 1.1rem; margin-bottom: 0.5rem;">💬 WhatsApp</h3>
+                    <h3 style="font-size: 1.1rem; margin-bottom: 0.5rem;"><i class="fab fa-whatsapp"></i> WhatsApp</h3>
                     <a href="https://wa.me/<?php echo getSetting('whatsapp', '260770377471'); ?>" 
                        style="color: var(--primary-orange);" target="_blank">
                         Chat with us on WhatsApp
@@ -63,7 +63,7 @@ $phone = getSetting('phone', '0770377471');
                     <textarea id="message" name="message" required></textarea>
                 </div>
                 
-                <button type="submit" class="btn btn-primary" style="width: 100%;">Send Message</button>
+                <button type="submit" class="btn btn-primary" style="width: 100%;"><i class="fas fa-paper-plane"></i> Send Message</button>
             </form>
         </div>
     </div>
@@ -71,7 +71,7 @@ $phone = getSetting('phone', '0770377471');
 
 <section style="background: var(--light-grey); padding: 3rem 2rem; text-align: center;">
     <div class="container">
-        <h2>Visit Our Office</h2>
+        <h2><i class="fas fa-map-marker-alt"></i> Visit Our Office</h2>
         <p style="font-size: 1.1rem; margin-top: 1rem;">Kitwe, Copperbelt Province, Zambia</p>
         <p>We're always happy to welcome visitors. Please contact us to schedule a visit.</p>
     </div>

@@ -24,7 +24,8 @@ require_once 'includes/header.php';
     
     <div class="services-grid" style="margin-top: 3rem;">
         <div class="service-card fade-in">
-            <h3>🌍 The Problem</h3>
+            <div class="service-icon"><i class="fas fa-exclamation-triangle"></i></div>
+            <h3>The Problem</h3>
             <p><strong>Plastic Pollution:</strong> Millions of tons of plastic waste pollute our communities, 
             water bodies, and ecosystems.</p>
             <p><strong>Urban Waste Crisis:</strong> Growing cities struggle with inadequate waste management 
@@ -34,7 +35,8 @@ require_once 'includes/header.php';
         </div>
         
         <div class="service-card fade-in">
-            <h3>💡 Our Solution</h3>
+            <div class="service-icon"><i class="fas fa-lightbulb"></i></div>
+            <h3>Our Solution</h3>
             <p><strong>Circular Economy:</strong> We collect, sort, and recycle plastic waste into valuable 
             products.</p>
             <p><strong>Eco-Friendly Products:</strong> Durable pavers and tiles made from 100% recycled 
@@ -56,7 +58,7 @@ require_once 'includes/header.php';
                 transformed into something valuable.
             </p>
             <div style="margin-top: 2rem;">
-                <a href="<?php echo SITE_URL; ?>/contact.php" class="btn btn-primary">Join Our Mission</a>
+                <a href="<?php echo SITE_URL; ?>/contact.php" class="btn btn-primary"><i class="fas fa-hands-helping"></i> Join Our Mission</a>
             </div>
         </div>
     </div>
@@ -66,22 +68,26 @@ require_once 'includes/header.php';
     <h2 class="section-title">Our Values</h2>
     <div class="services-grid">
         <div class="service-card fade-in">
-            <h3>♻️ Sustainability First</h3>
+            <div class="service-icon"><i class="fas fa-leaf"></i></div>
+            <h3>Sustainability First</h3>
             <p>Every decision we make prioritizes environmental impact and long-term sustainability.</p>
         </div>
         
         <div class="service-card fade-in">
-            <h3>💡 Innovation</h3>
+            <div class="service-icon"><i class="fas fa-lightbulb"></i></div>
+            <h3>Innovation</h3>
             <p>We continuously seek new ways to improve our processes and create better products.</p>
         </div>
         
         <div class="service-card fade-in">
-            <h3>🤝 Community Engagement</h3>
+            <div class="service-icon"><i class="fas fa-handshake"></i></div>
+            <h3>Community Engagement</h3>
             <p>We work hand-in-hand with communities, creating awareness and opportunities.</p>
         </div>
         
         <div class="service-card fade-in">
-            <h3>📈 Scalable Impact</h3>
+            <div class="service-icon"><i class="fas fa-chart-line"></i></div>
+            <h3>Scalable Impact</h3>
             <p>Building solutions that can grow and make a difference across Zambia and beyond.</p>
         </div>
     </div>

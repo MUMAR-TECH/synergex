@@ -206,6 +206,118 @@ try {
             }
             break;
             
+        // ===== CHATBOT ACTIONS =====
+        case 'get_conversation':
+            $conversationId = intval($_POST['conversation_id'] ?? 0);
+            
+            $conv = $db->query("SELECT * FROM chatbot_conversations WHERE id = ?", [$conversationId]);
+            $messages = $db->query("SELECT * FROM chatbot_messages WHERE conversation_id = ? ORDER BY created_at ASC", [$conversationId]);
+            
+            echo json_encode([
+                'success' => true, 
+                'conversation' => $conv[0] ?? null,
+                'messages' => $messages
+            ]);
+            break;
+            
+        case 'get_knowledge':
+            $knowledge = $db->query("SELECT * FROM chatbot_knowledge ORDER BY priority DESC, created_at DESC");
+            echo json_encode(['success' => true, 'knowledge' => $knowledge]);
+            break;
+            
+        case 'get_knowledge_item':
+            $id = intval($_POST['id'] ?? 0);
+            $item = $db->query("SELECT * FROM chatbot_knowledge WHERE id = ?", [$id]);
+            echo json_encode(['success' => true, 'item' => $item[0] ?? null]);
+            break;
+            
+        case 'save_knowledge':
+            $id = intval($_POST['id'] ?? 0);
+            $question = sanitizeInput($_POST['question'] ?? '');
+            $answer = sanitizeInput($_POST['answer'] ?? '');
+            $category = sanitizeInput($_POST['category'] ?? 'general');
+            $keywords = sanitizeInput($_POST['keywords'] ?? '');
+            $priority = intval($_POST['priority'] ?? 50);
+            $isActive = isset($_POST['is_active']) ? 1 : 0;
+            
+            if (empty($question) || empty($answer)) {
+                echo json_encode(['success' => false, 'message' => 'Question and answer are required']);
+                exit;
+            }
+            
+            $data = [
+                'question' => $question,
+                'answer' => $answer,
+                'category' => $category,
+                'keywords' => $keywords,
+                'priority' => $priority,
+                'is_active' => $isActive
+            ];
+            
+            if ($id > 0) {
+                $result = $db->update('chatbot_knowledge', $data, 'id = ?', [$id]);
+            } else {
+                $result = $db->insert('chatbot_knowledge', $data);
+            }
+            
+            if ($result) {
+                echo json_encode(['success' => true, 'message' => 'Knowledge saved successfully']);
+            } else {
+                echo json_encode(['success' => false, 'message' => 'Failed to save knowledge']);
+            }
+            break;
+            
+        case 'delete_knowledge':
+            $id = intval($_POST['id'] ?? 0);
+            $result = $db->delete('chatbot_knowledge', 'id = ?', [$id]);
+            
+            if ($result) {
+                echo json_encode(['success' => true, 'message' => 'Knowledge deleted successfully']);
+            } else {
+                echo json_encode(['success' => false, 'message' => 'Failed to delete knowledge']);
+            }
+            break;
+            
+        case 'get_chatbot_settings':
+            $settings = [];
+            $results = $db->query("SELECT setting_key, setting_value FROM chatbot_settings");
+            
+            foreach ($results as $row) {
+                $settings[$row['setting_key']] = $row['setting_value'];
+            }
+            
+            echo json_encode(['success' => true, 'settings' => $settings]);
+            break;
+            
+        case 'save_chatbot_settings':
+            $settings = [
+                'chatbot_enabled' => $_POST['chatbot_enabled'] ?? '1',
+                'chatbot_name' => sanitizeInput($_POST['chatbot_name'] ?? 'Synergex Assistant'),
+                'chatbot_greeting' => sanitizeInput($_POST['chatbot_greeting'] ?? ''),
+                'chatbot_color' => sanitizeInput($_POST['chatbot_color'] ?? '#27ae60'),
+                'chatbot_position' => sanitizeInput($_POST['chatbot_position'] ?? 'bottom-right'),
+                'offline_message' => sanitizeInput($_POST['offline_message'] ?? '')
+            ];
+            
+            $success = true;
+            foreach ($settings as $key => $value) {
+                $result = $db->query(
+                    "INSERT INTO chatbot_settings (setting_key, setting_value) VALUES (?, ?) 
+                     ON DUPLICATE KEY UPDATE setting_value = ?",
+                    [$key, $value, $value]
+                );
+                if (!$result) {
+                    $success = false;
+                }
+            }
+            
+            if ($success) {
+                echo json_encode(['success' => true, 'message' => 'Settings saved successfully']);
+            } else {
+                echo json_encode(['success' => false, 'message' => 'Failed to save settings']);
+            }
+            break;
+            
         default:
             echo json_encode(['success' => false, 'message' => 'Invalid action']);
             break;

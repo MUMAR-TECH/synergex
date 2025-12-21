@@ -23,22 +23,22 @@ $vision = getSetting('vision', 'A cleaner, greener Zambia where waste is transfo
         <h2 class="section-title">Our Approach</h2>
         <div class="services-grid">
             <div class="service-card fade-in">
-                <h3>🌍 Sustainability First</h3>
+                <h3><i class="fas fa-globe"></i> Sustainability First</h3>
                 <p>Every decision we make prioritizes environmental impact and long-term sustainability. We believe in creating solutions that benefit both people and planet.</p>
             </div>
             
             <div class="service-card fade-in">
-                <h3>💡 Innovation</h3>
+                <h3><i class="fas fa-lightbulb"></i> Innovation</h3>
                 <p>We continuously seek new ways to improve our processes, develop better products, and find creative solutions to waste management challenges.</p>
             </div>
             
             <div class="service-card fade-in">
-                <h3>🤝 Community Engagement</h3>
+                <h3><i class="fas fa-handshake"></i> Community Engagement</h3>
                 <p>We work hand-in-hand with communities, creating awareness, providing education, and generating economic opportunities through sustainable practices.</p>
             </div>
             
             <div class="service-card fade-in">
-                <h3>📈 Scalable Impact</h3>
+                <h3><i class="fas fa-chart-line"></i> Scalable Impact</h3>
                 <p>Building solutions that can grow and replicate across Zambia and beyond, creating lasting positive change for generations to come.</p>
             </div>
         </div>

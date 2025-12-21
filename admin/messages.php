@@ -161,7 +161,7 @@ function viewMessage(message) {
             <span class="status-badge status-${message.status}">${message.status.charAt(0).toUpperCase() + message.status.slice(1)}</span>
         </div>
         <div style="margin-top: 1.5rem;">
-            <a href="mailto:${message.email}?subject=Re: ${encodeURIComponent(message.subject || 'Your message')}" class="btn btn-primary">📧 Reply via Email</a>
+            <a href="mailto:${message.email}?subject=Re: ${encodeURIComponent(message.subject || 'Your message')}" class="btn btn-primary"><i class="fas fa-envelope"></i> Reply via Email</a>
         </div>
     `;
     

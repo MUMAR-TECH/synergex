@@ -39,8 +39,8 @@ $products = getProducts(true);
                 <?php endif; ?>
                 
                 <div style="display: flex; gap: 1rem; margin-top: 1rem;">
-                    <button class="btn btn-primary calculate-btn" data-product-id="<?php echo $product['id']; ?>" data-product-name="<?php echo htmlspecialchars($product['name']); ?>" data-product-price="<?php echo $product['price']; ?>">Calculate Cost</button>
-                    <a href="https://wa.me/<?php echo getSetting('whatsapp', '260770377471'); ?>?text=I'm interested in <?php echo urlencode($product['name']); ?>" class="btn btn-secondary" target="_blank">WhatsApp</a>
+                    <button class="btn btn-primary calculate-btn" data-product-id="<?php echo $product['id']; ?>" data-product-name="<?php echo htmlspecialchars($product['name']); ?>" data-product-price="<?php echo $product['price']; ?>"><i class="fas fa-calculator"></i> Calculate Cost</button>
+                    <a href="https://wa.me/<?php echo getSetting('whatsapp', '260770377471'); ?>?text=I'm interested in <?php echo urlencode($product['name']); ?>" class="btn btn-secondary" target="_blank"><i class="fab fa-whatsapp"></i> WhatsApp</a>
                 </div>
             </div>
         </div>

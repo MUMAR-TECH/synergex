@@ -1,0 +1,46 @@
+# Environment Configuration
+.env
+
+# IDE and Editor Files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# Logs
+*.log
+error_log
+debug.log
+
+# Temporary Files
+tmp/
+temp/
+cache/
+
+# Upload Files (keep the directory structure)
+assets/images/uploads/*
+!assets/images/uploads/.gitkeep
+
+# Node Modules (if you add any frontend tools)
+node_modules/
+package-lock.json
+yarn.lock
+
+# Composer (if you add PHP dependencies)
+vendor/
+composer.lock
+
+# OS Generated Files
+Thumbs.db
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# Backup Files
+*.bak
+*.backup
+*.sql.gz
+*.zip
+*.tar.gz
