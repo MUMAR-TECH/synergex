@@ -14,7 +14,7 @@ $error = '';
 $result = handleAdminFormSubmission(
     'achievements',
     ['year', 'title', 'description'], // required fields
-    ['category', 'display_order'], // optional fields
+    ['detailed_content', 'gallery_images', 'category', 'display_order'], // optional fields
     'image' // image field
 );
 
@@ -143,6 +143,18 @@ include 'includes/admin_header.php';
                 <textarea id="description" name="description" rows="4"></textarea>
             </div>
             
+            <div class="form-group">
+                <label for="detailed_content">Detailed Content</label>
+                <textarea id="detailed_content" name="detailed_content" rows="8" placeholder="Full details about this achievement (supports line breaks)"></textarea>
+                <small style="color: #666; font-size: 0.85rem;">This content will be displayed on the achievement details page</small>
+            </div>
+            
+            <div class="form-group">
+                <label for="gallery_images">Gallery Images (URLs or upload multiple)</label>
+                <input type="text" id="gallery_images" name="gallery_images" placeholder="Paste image URLs separated by commas or leave blank">
+                <small style="color: #666; font-size: 0.85rem;">You can add multiple image URLs separated by commas for a gallery</small>
+            </div>
+            
             <div class="form-row">
                 <div class="form-group">
                     <label for="display_order">Display Order</label>
@@ -182,6 +194,8 @@ function editAchievement(achievement) {
     document.getElementById('year').value = achievement.year;
     document.getElementById('title').value = achievement.title;
     document.getElementById('description').value = achievement.description || '';
+    document.getElementById('detailed_content').value = achievement.detailed_content || '';
+    document.getElementById('gallery_images').value = achievement.gallery_images || '';
     document.getElementById('category').value = achievement.category || '';
     document.getElementById('display_order').value = achievement.display_order;
     

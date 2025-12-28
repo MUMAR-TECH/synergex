@@ -149,24 +149,45 @@ function formatNumber($number) {
 }
 
 function isLoggedIn() {
-    return isset($_SESSION['admin_id']) && !empty($_SESSION['admin_id']);
+    return SessionManager::has('admin_id') && !empty(SessionManager::get('admin_id'));
 }
 
 function requireLogin() {
     if (!isLoggedIn()) {
+        // Regenerate session on login page
+        SessionManager::regenerate();
         header('Location: ' . ADMIN_URL . '/index.php');
         exit;
+    }
+    
+    // Additional validation - check if admin_id is valid
+    $adminId = SessionManager::get('admin_id');
+    if (!$adminId || $adminId <= 0) {
+        // Invalid admin ID, clear session
+        SessionManager::destroy();
+        header('Location: ' . ADMIN_URL . '/index.php?retry=1');
+        exit;
+    }
+    
+    // Check session timeout
+    if (SessionManager::has('LAST_ACTIVITY')) {
+        $timeout = defined('SESSION_LIFETIME') ? SESSION_LIFETIME : 7200;
+        if (time() - SessionManager::get('LAST_ACTIVITY') > $timeout) {
+            SessionManager::destroy();
+            header('Location: ' . ADMIN_URL . '/index.php?timeout=1');
+            exit;
+        }
     }
 }
 
 function generateCSRFToken() {
-    if (empty($_SESSION['csrf_token'])) {
-        $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
+    if (!SessionManager::has('csrf_token')) {
+        SessionManager::set('csrf_token', bin2hex(random_bytes(32)));
     }
-    return $_SESSION['csrf_token'];
+    return SessionManager::get('csrf_token');
 }
 
 function verifyCSRFToken($token) {
-    return isset($_SESSION['csrf_token']) && hash_equals($_SESSION['csrf_token'], $token);
+    return SessionManager::has('csrf_token') && hash_equals(SessionManager::get('csrf_token'), $token);
 }
 ?>

@@ -9,6 +9,7 @@
 
 // Load environment variables
 require_once __DIR__ . '/includes/env.php';
+require_once __DIR__ . '/includes/session_manager.php';
 
 try {
     EnvLoader::load(__DIR__ . '/.env');
@@ -72,10 +73,14 @@ if (APP_ENV === 'development' || APP_DEBUG) {
     ini_set('error_log', __DIR__ . '/error_log');
 }
 
-// Start session
-if (session_status() === PHP_SESSION_NONE) {
-    session_start();
-}
+// Initialize Session Manager (handles secure session and cookie management)
+SessionManager::init();
+
+// Initialize Memory Manager (optimizes memory usage and output buffering)
+MemoryManager::init();
+
+// Set cache headers for dynamic content
+CacheManager::noCache();
 
 // Security Headers (for production)
 if (APP_ENV === 'production') {
@@ -83,5 +88,6 @@ if (APP_ENV === 'production') {
     header('X-Content-Type-Options: nosniff');
     header('X-XSS-Protection: 1; mode=block');
     header('Referrer-Policy: strict-origin-when-cross-origin');
+    header('Strict-Transport-Security: max-age=31536000; includeSubDomains');
 }
 ?>

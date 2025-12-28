@@ -36,7 +36,9 @@ CREATE TABLE `achievements` (
   `year` int(11) NOT NULL,
   `title` varchar(255) NOT NULL,
   `description` text DEFAULT NULL,
+  `detailed_content` text DEFAULT NULL COMMENT 'Full detailed content for details page',
   `image` varchar(255) DEFAULT NULL,
+  `gallery_images` text DEFAULT NULL COMMENT 'JSON array of additional gallery images',
   `category` varchar(100) DEFAULT NULL COMMENT 'grant, pilot, recognition, partnership, media',
   `display_order` int(11) DEFAULT 0,
   `created_at` timestamp NOT NULL DEFAULT current_timestamp()
@@ -306,6 +308,7 @@ CREATE TABLE `products` (
   `name` varchar(255) NOT NULL,
   `description` text DEFAULT NULL,
   `price` decimal(10,2) NOT NULL,
+  `price_per_sqm` decimal(10,2) DEFAULT 140.00 COMMENT 'Price per square meter for calculator',
   `unit` varchar(50) DEFAULT 'per unit',
   `features` text DEFAULT NULL COMMENT 'Pipe-separated list: Feature1|Feature2|Feature3',
   `image` varchar(255) DEFAULT NULL,

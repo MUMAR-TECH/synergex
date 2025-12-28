@@ -1,4 +1,7 @@
 <?php
+// Clean up old flash messages from previous requests
+SessionManager::cleanFlashMessages();
+
 require_once __DIR__ . '/functions.php';
 $siteName = getSetting('site_name', 'Synergex Solutions');
 $tagline = getSetting('tagline', 'Turning Waste Into Sustainable Value');

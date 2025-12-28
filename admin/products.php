@@ -14,7 +14,7 @@ $error = '';
 $result = handleAdminFormSubmission(
     'products',
     ['name', 'description'], // required fields
-    ['price', 'unit', 'features', 'is_active'], // optional fields
+    ['price', 'price_per_sqm', 'unit', 'features', 'is_active'], // optional fields
     'image' // image field
 );
 
@@ -142,6 +142,12 @@ include 'includes/admin_header.php';
             </div>
             
             <div class="form-group">
+                <label for="price_per_sqm">Price per Square Meter (ZMW)</label>
+                <input type="number" id="price_per_sqm" name="price_per_sqm" step="0.01" value="140.00" placeholder="140.00">
+                <small style="color: #666; font-size: 0.85rem;">Used for area-based cost calculator</small>
+            </div>
+            
+            <div class="form-group">
                 <label for="features">Features (separated by |)</label>
                 <input type="text" id="features" name="features" placeholder="Durable|Water-resistant|Eco-friendly">
             </div>
@@ -235,6 +241,7 @@ function editProduct(product) {
     document.getElementById('name').value = product.name;
     document.getElementById('description').value = product.description || '';
     document.getElementById('price').value = product.price;
+    document.getElementById('price_per_sqm').value = product.price_per_sqm || 140.00;
     document.getElementById('unit').value = product.unit;
     document.getElementById('features').value = product.features || '';
     document.getElementById('is_active').checked = product.is_active == 1;

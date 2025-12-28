@@ -48,21 +48,14 @@ $whatsapp = getSetting('whatsapp', '260770377471');
         <i class="fab fa-whatsapp"></i>
     </a>
     
-    <!-- AI Chatbot Styles and Script -->
-    <link rel="stylesheet" href="<?php echo SITE_URL; ?>/assets/css/chatbot.css">
-    <script>
-        // Chatbot configuration
-        window.CHATBOT_CONFIG = {
-            apiUrl: '<?php echo SITE_URL; ?>/api/chatbot.php',
-            siteUrl: '<?php echo SITE_URL; ?>'
-        };
-    </script>
-    <script src="<?php echo SITE_URL; ?>/assets/js/chatbot.js"></script>
-    
     <script src="<?php echo SITE_URL; ?>/assets/js/main.js"></script>
 </body>
 </html>
 <?php
-// Close any open database connections
+// Clean up resources and optimize memory
 $db = null;
+unset($siteName, $tagline, $currentPage, $email, $phone, $whatsapp);
+
+// Trigger memory cleanup
+MemoryManager::cleanup();
 ?>

@@ -24,14 +24,19 @@ $achievements = getAchievements();
         <div class="timeline-item fade-in">
             <div class="timeline-year"><?php echo $achievement['year']; ?></div>
             <div class="timeline-content">
-                <h3><a href="achievement-details.php?id=<?php echo $achievement['id']; ?>"><?php echo htmlspecialchars($achievement['title']); ?></a></h3>
+                <h3><a href="achievement-details.php?id=<?php echo $achievement['id']; ?>" style="color: inherit; text-decoration: none;"><?php echo htmlspecialchars($achievement['title']); ?></a></h3>
                 <p><?php echo htmlspecialchars($achievement['description']); ?></p>
                 <?php if ($achievement['image']): ?>
                 <img src="<?php echo UPLOAD_URL . $achievement['image']; ?>" alt="<?php echo htmlspecialchars($achievement['title']); ?>" class="timeline-image">
                 <?php endif; ?>
-                <?php if ($achievement['category']): ?>
-                <span class="badge" style="margin-top: 1rem;"><?php echo ucfirst(str_replace('_', ' ', $achievement['category'])); ?></span>
-                <?php endif; ?>
+                <div style="display: flex; align-items: center; gap: 1rem; margin-top: 1rem; flex-wrap: wrap;">
+                    <?php if ($achievement['category']): ?>
+                    <span class="badge"><?php echo ucfirst(str_replace('_', ' ', $achievement['category'])); ?></span>
+                    <?php endif; ?>
+                    <a href="achievement-details.php?id=<?php echo $achievement['id']; ?>" class="btn btn-secondary" style="font-size: 0.9rem; padding: 0.5rem 1rem;">
+                        <i class="fas fa-arrow-right"></i> View Details
+                    </a>
+                </div>
             </div>
         </div>
         <?php endforeach; ?>

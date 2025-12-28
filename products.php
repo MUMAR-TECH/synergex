@@ -39,8 +39,8 @@ $products = getProducts(true);
                 <?php endif; ?>
                 
                 <div style="display: flex; gap: 1rem; margin-top: 1rem;">
-                    <button class="btn btn-primary calculate-btn" data-product-id="<?php echo $product['id']; ?>" data-product-name="<?php echo htmlspecialchars($product['name']); ?>" data-product-price="<?php echo $product['price']; ?>"><i class="fas fa-calculator"></i> Calculate Cost</button>
-                    <a href="https://wa.me/<?php echo getSetting('whatsapp', '260770377471'); ?>?text=I'm interested in <?php echo urlencode($product['name']); ?>" class="btn btn-secondary" target="_blank"><i class="fab fa-whatsapp"></i> WhatsApp</a>
+                    <button class="btn btn-primary calculate-btn" data-product-id="<?php echo $product['id']; ?>" data-product-name="<?php echo htmlspecialchars($product['name']); ?>" data-product-price="<?php echo $product['price']; ?>" data-price-per-sqm="<?php echo $product['price_per_sqm'] ?? 140; ?>"><i class="fas fa-calculator"></i> Calculate Cost</button>
+                    <a href="https://wa.me/<?php echo getSetting('whatsapp', '260770377471'); ?>?text=I'm interested in <?php echo urlencode($product['name']); ?>" class="btn btn-secondary" target="_blank" title="Contact via WhatsApp"><i class="fab fa-whatsapp"></i></a>
                 </div>
             </div>
         </div>
@@ -65,7 +65,7 @@ $products = getProducts(true);
                 <div class="toggle-switch">
                     <label>
                         <input type="checkbox" id="installation">
-                        Include Installation (K5 per unit)
+                        Include Installation (K400 flat fee)
                     </label>
                 </div>
             </div>
@@ -180,7 +180,8 @@ $products = getProducts(true);
 let selectedProduct = {
     id: null,
     name: '',
-    price: 0
+    price: 0,
+    pricePerSqm: 140
 };
 
 // Modal handling
@@ -194,6 +195,7 @@ document.querySelectorAll('.calculate-btn').forEach(btn => {
         selectedProduct.id = this.dataset.productId;
         selectedProduct.name = this.dataset.productName;
         selectedProduct.price = parseFloat(this.dataset.productPrice);
+        selectedProduct.pricePerSqm = parseFloat(this.dataset.pricePerSqm) || 140;
         
         document.getElementById('selectedProduct').textContent = selectedProduct.name;
         document.getElementById('calcResult').style.display = 'none';
@@ -231,13 +233,15 @@ document.getElementById('calculateBtn').addEventListener('click', function() {
         return;
     }
     
-    // Assuming 200mm x 200mm pavers = 0.04 sqm per unit
+    // Use product's price per square meter
+    const pricePerSqm = selectedProduct.pricePerSqm;
+    const productCost = area * pricePerSqm;
+    const installationCost = includeInstallation ? 400 : 0; // K400 flat installation fee
+    const totalCost = productCost + installationCost;
+    
+    // Calculate units for display (assuming 200mm x 200mm pavers = 0.04 sqm per unit)
     const unitsPerSqm = 25; // 1 / 0.04
     const unitsNeeded = Math.ceil(area * unitsPerSqm);
-    const productCost = unitsNeeded * selectedProduct.price;
-    const installationRate = 5; // K5 per unit
-    const installationCost = includeInstallation ? unitsNeeded * installationRate : 0;
-    const totalCost = productCost + installationCost;
     
     // Display results
     document.getElementById('resultArea').textContent = area.toFixed(2);

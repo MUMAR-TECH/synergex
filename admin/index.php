@@ -5,32 +5,76 @@
 require_once __DIR__ . '/../config.php';
 require_once __DIR__ . '/../includes/db.php';
 
-// If already logged in, redirect to dashboard
-if (isset($_SESSION['admin_id'])) {
-    header('Location: dashboard.php');
-    exit;
+// Prevent redirect loops - check if we just came from this page
+$justRedirected = isset($_GET['retry']);
+
+// If already logged in, redirect to dashboard (but not if we just got here)
+if (SessionManager::has('admin_id') && !$justRedirected) {
+    // Double-check the admin_id is valid
+    $adminId = SessionManager::get('admin_id');
+    if ($adminId && $adminId > 0) {
+        header('Location: dashboard.php');
+        exit;
+    } else {
+        // Invalid session, clear it
+        SessionManager::destroy();
+    }
 }
 
 $error = '';
+$timeout = isset($_GET['timeout']) ? 'Your session has expired. Please login again.' : '';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $email = trim($_POST['email'] ?? '');
     $password = $_POST['password'] ?? '';
+    $remember = isset($_POST['remember']);
     
     if (empty($email) || empty($password)) {
         $error = 'Please enter both email and password';
     } else {
-        $db = Database::getInstance();
-        $admin = $db->fetchOne("SELECT * FROM admin_users WHERE email = ?", [$email]);
-        
-        if ($admin && password_verify($password, $admin['password'])) {
-            $_SESSION['admin_id'] = $admin['id'];
-            $_SESSION['admin_name'] = $admin['name'];
-            $_SESSION['admin_email'] = $admin['email'];
-            header('Location: dashboard.php');
-            exit;
-        } else {
-            $error = 'Invalid email or password';
+        try {
+            $db = Database::getInstance();
+            $admin = $db->fetchOne("SELECT * FROM admin_users WHERE email = ?", [$email]);
+            
+            if ($admin && isset($admin['id']) && $admin['id'] > 0 && password_verify($password, $admin['password'])) {
+                // Clear any existing session first
+                SessionManager::destroy();
+                
+                // Start fresh session
+                SessionManager::init();
+                SessionManager::regenerate();
+                
+                // Set session variables with explicit values
+                SessionManager::set('admin_id', (int)$admin['id']);
+                SessionManager::set('admin_name', $admin['name']);
+                SessionManager::set('admin_email', $admin['email']);
+                SessionManager::set('login_time', time());
+                SessionManager::set('logged_in', true);
+                
+                // Verify session was set correctly
+                if (SessionManager::get('admin_id') > 0) {
+                    // Set remember me cookie if checked
+                    if ($remember) {
+                        $token = bin2hex(random_bytes(32));
+                        CookieManager::set('remember_token', $token, 30 * 24 * 60 * 60);
+                    }
+                    
+                    // Redirect to dashboard
+                    header('Location: dashboard.php');
+                    exit;
+                } else {
+                    $error = 'Session initialization failed. Please try again.';
+                }
+            } else {
+                $error = 'Invalid email or password';
+                // Add delay to prevent brute force
+                sleep(1);
+            }
+        } catch (Exception $e) {
+            $error = 'Login error: ' . (APP_DEBUG ? $e->getMessage() : 'Please try again');
+            if (APP_DEBUG) {
+                error_log('Login error: ' . $e->getMessage());
+            }
         }
     }
 }

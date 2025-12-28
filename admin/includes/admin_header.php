@@ -28,7 +28,7 @@ $currentPage = basename($_SERVER['PHP_SELF'], '.php');
             <div class="sidebar-header">
                 <h2><i class="fas fa-leaf"></i> Synergex Admin</h2>
                 <p style="font-size: 0.85rem; opacity: 0.8; margin-top: 0.5rem;">
-                    <i class="fas fa-user-circle"></i> <?php echo htmlspecialchars($_SESSION['admin_name']); ?>
+                    <i class="fas fa-user-circle"></i> <?php echo htmlspecialchars(SessionManager::get('admin_name', 'Admin')); ?>
                 </p>
             </div>
             
@@ -62,9 +62,6 @@ $currentPage = basename($_SERVER['PHP_SELF'], '.php');
                 </a>
                 <a href="subscribers.php" class="nav-item <?php echo $currentPage == 'subscribers' ? 'active' : ''; ?>">
                     <i class="fas fa-users"></i> Subscribers
-                </a>
-                <a href="chatbot.php" class="nav-item <?php echo $currentPage == 'chatbot' ? 'active' : ''; ?>">
-                    <i class="fas fa-robot"></i> AI Chatbot
                 </a>
                 <a href="settings.php" class="nav-item <?php echo $currentPage == 'settings' ? 'active' : ''; ?>">
                     <i class="fas fa-cog"></i> Settings

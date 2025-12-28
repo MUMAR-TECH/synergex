@@ -18,7 +18,12 @@ class Database {
                 ]
             );
         } catch(PDOException $e) {
-            die("Connection failed: " . $e->getMessage());
+            if (APP_DEBUG) {
+                die("Connection failed: " . $e->getMessage());
+            } else {
+                error_log("Database connection failed: " . $e->getMessage());
+                die("Database connection error. Please contact the administrator.");
+            }
         }
     }
 
@@ -35,16 +40,15 @@ class Database {
 
     public function query($sql, $params = []) {
         try {
-            error_log("Executing SQL: " . $sql);
-            error_log("With params: " . print_r($params, true));
             $stmt = $this->conn->prepare($sql);
             $result = $stmt->execute($params);
-            error_log("Query execution result: " . ($result ? 'SUCCESS' : 'FAILED'));
             return $stmt;
         } catch(PDOException $e) {
-            error_log("Database Error: " . $e->getMessage());
-            error_log("Failed SQL: " . $sql);
-            error_log("Failed params: " . print_r($params, true));
+            if (APP_DEBUG) {
+                error_log("Database Error: " . $e->getMessage());
+                error_log("Failed SQL: " . $sql);
+                error_log("Failed params: " . print_r($params, true));
+            }
             return false;
         }
     }

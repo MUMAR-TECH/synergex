@@ -14,6 +14,12 @@
 error_log
 debug.log
 
+# Testing/Debug Files (DELETE in production)
+security-check.php
+system-health.php
+fix-database.php
+test-*.php
+
 # Temporary Files
 tmp/
 temp/
@@ -22,6 +28,10 @@ cache/
 # Upload Files (keep the directory structure)
 assets/images/uploads/*
 !assets/images/uploads/.gitkeep
+
+# Database backups
+*.sql.backup
+backup/
 
 # Node Modules (if you add any frontend tools)
 node_modules/

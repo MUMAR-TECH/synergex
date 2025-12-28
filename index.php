@@ -69,38 +69,6 @@ $heroSlides = getHeroSlides(true);
     <?php endif; ?>
 </section>
 
-<!-- Impact Statistics Section -->
-<section class="impact-section">
-    <div class="container">
-        <h2 class="section-title">Our Impact</h2>
-        <div class="impact-grid">
-            <div class="impact-card fade-in">
-                <div class="impact-icon"><i class="fas fa-recycle"></i></div>
-                <div class="impact-number"><?php echo formatNumber($stats['plastic_recycled']); ?></div>
-                <div class="impact-label">Kg of Plastic Recycled</div>
-            </div>
-            
-            <div class="impact-card fade-in">
-                <div class="impact-icon"><i class="fas fa-cube"></i></div>
-                <div class="impact-number"><?php echo formatNumber($stats['eco_pavers_produced']); ?></div>
-                <div class="impact-label">Eco-Pavers Produced</div>
-            </div>
-            
-            <div class="impact-card fade-in">
-                <div class="impact-icon"><i class="fas fa-building"></i></div>
-                <div class="impact-number"><?php echo formatNumber($stats['institutions_served']); ?></div>
-                <div class="impact-label">Institutions Served</div>
-            </div>
-            
-            <div class="impact-card fade-in">
-                <div class="impact-icon"><i class="fas fa-users"></i></div>
-                <div class="impact-number"><?php echo formatNumber($stats['youths_engaged']); ?></div>
-                <div class="impact-label">Youths Engaged</div>
-            </div>
-        </div>
-    </div>
-</section>
-
 <!-- What We Do Section -->
 <section class="container">
     <h2 class="section-title">What We Do</h2>
