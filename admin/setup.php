@@ -17,13 +17,13 @@ try {
     // Create admin_users table if it doesn't exist
     $db->getConnection()->exec("
         CREATE TABLE IF NOT EXISTS admin_users (
-            id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+            id INT UNSIGNED PRIMARY KEY,
             email VARCHAR(255) UNIQUE NOT NULL,
             password VARCHAR(255) NOT NULL,
             name VARCHAR(255) NOT NULL,
             created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
             INDEX idx_email (email)
-        ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
+        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
     ");
     
     // Check if any admin exists
@@ -53,16 +53,23 @@ try {
             if ($existing) {
                 $error = 'An admin account with this email already exists';
             } else {
-                // Create admin account
+                // Generate proper ID in PHP (MySQL AUTO_INCREMENT unreliable on some hosts)
+                $maxId = $db->fetchOne("SELECT MAX(id) as max_id FROM admin_users");
+                $nextId = ($maxId && $maxId['max_id']) ? (int)$maxId['max_id'] + 1 : 1;
+                
+                // Create admin account with explicit ID
                 $hashedPassword = password_hash($password, PASSWORD_DEFAULT);
                 
-                $db->insert('admin_users', [
-                    'email' => $email,
-                    'password' => $hashedPassword,
-                    'name' => $name
-                ]);
+                $result = $db->query(
+                    "INSERT INTO admin_users (id, email, password, name) VALUES (?, ?, ?, ?)",
+                    [$nextId, $email, $hashedPassword, $name]
+                );
                 
-                $success = 'Admin account created successfully! You can now login.';
+                if ($result) {
+                    $success = 'Admin account created successfully! You can now login.';
+                } else {
+                    $error = 'Failed to create admin account. Please try again.';
+                }
             }
         }
     }

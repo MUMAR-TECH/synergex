@@ -1,127 +1,187 @@
-Synergex Solutions - Complete Website with CMS
-Show Image
+# Synergex Solutions - Complete Website with CMS
 
-Tagline: Turning Waste Into Sustainable Value
+![Synergex Solutions](assets/images/logo.png)
+
+**Tagline:** Turning Waste Into Sustainable Value
 
 A fully dynamic, professional website with complete Content Management System (CMS) for Synergex Solutions - a sustainability-driven enterprise focused on plastic waste recycling and eco-friendly product manufacturing.
 
-📋 Table of Contents
-Features
-Technology Stack
-System Requirements
-Installation Guide
-File Structure
-Default Credentials
-Configuration
-Usage Guide
-Admin Panel Features
-Troubleshooting
-Security
-Backup & Maintenance
-Support
-✨ Features
-Frontend Features
-✅ Responsive, mobile-first design
-✅ Dynamic content from database
-✅ Product catalog with pricing
-✅ Interactive cost calculator
-✅ Image gallery with categories
-✅ Achievement timeline
-✅ Contact form
-✅ Newsletter subscription
-✅ Quote request system
-✅ WhatsApp integration
-✅ SEO-friendly structure
-Admin CMS Features
-✅ Secure admin login
-✅ Dashboard with statistics
-✅ Product management (CRUD)
-✅ Gallery management with image upload
-✅ Achievement management
-✅ Quote request tracking
-✅ Contact message inbox
-✅ Newsletter subscriber management
-✅ Site settings editor
-✅ Impact statistics control
-✅ Partner management
-🛠 Technology Stack
-Backend: PHP 8.0+ with PDO
-Database: MySQL 5.7+ / MariaDB
-Frontend: HTML5, CSS3, JavaScript (ES6+)
+## 📋 Table of Contents
+- [Features](#features)
+- [Technology Stack](#technology-stack)
+- [System Requirements](#system-requirements)
+- [Installation Guide](#installation-guide)
+  - [Localhost Setup](#localhost-setup)
+  - [cPanel Deployment](#cpanel-deployment)
+- [File Structure](#file-structure)
+- [Configuration](#configuration)
+- [Usage Guide](#usage-guide)
+- [Admin Panel Features](#admin-panel-features)
+- [Troubleshooting](#troubleshooting)
+- [Security](#security)
+
+## ✨ Features
+
+### Frontend Features
+✅ Responsive, mobile-first design  
+✅ Dynamic content from database  
+✅ Product catalog with pricing  
+✅ Interactive cost calculator  
+✅ Image gallery with categories  
+✅ Achievement timeline  
+✅ Contact form  
+✅ Newsletter subscription  
+✅ Quote request system  
+✅ WhatsApp integration  
+✅ SEO-friendly structure  
+
+### Admin CMS Features
+✅ Secure admin login with session management  
+✅ Dashboard with statistics  
+✅ Product management (CRUD)  
+✅ Gallery management with image upload  
+✅ Achievement management  
+✅ Quote request tracking  
+✅ Contact message inbox  
+✅ Newsletter subscriber management  
+✅ Site settings editor  
+✅ Impact statistics control  
+✅ Partner management  
+
+## 🛠 Technology Stack
+- **Backend:** PHP 8.0+ with PDO
+- **Database:** MySQL 5.7+ / MariaDB
+- **Frontend:** HTML5, CSS3, JavaScript (ES6+)
 Design: Custom CSS with Google Fonts
 Architecture: MVC-inspired structure
 Security: Password hashing, prepared statements, CSRF protection
-💻 System Requirements
-Web Server: Apache 2.4+ with mod_rewrite
-PHP: 7.4 or higher (8.0+ recommended)
-MySQL: 5.7+ or MariaDB 10.3+
-PHP Extensions:
-PDO
-PDO_MySQL
-GD Library (for image processing)
-mbstring
-JSON
-Disk Space: 100MB minimum
-Memory: 128MB PHP memory limit
-📦 Installation Guide
-Step 1: Download and Extract
-Extract all files to your web server directory (e.g., htdocs/synergex/ or /var/www/html/synergex/)
-bash
-cd /path/to/webserver/root
-unzip synergex-website.zip
+## 💻 System Requirements
+
+### Minimum Requirements
+- **Web Server:** Apache 2.4+ with mod_rewrite
+- **PHP:** 7.4 or higher (8.0+ recommended)
+- **MySQL:** 5.7+ or MariaDB 10.3+
+- **PHP Extensions:**
+  - PDO
+  - PDO_MySQL
+  - GD Library (for image processing)
+  - mbstring
+  - JSON
+- **Disk Space:** 100MB minimum
+- **Memory:** 128MB PHP memory limit
+
+### Recommended for Production
+- **PHP:** 8.0 or higher
+- **SSL Certificate:** Let's Encrypt or commercial
+- **Memory:** 256MB+ PHP memory limit
+- **Backup System:** Automated daily backups
+
+## 📦 Installation Guide
+
+### Localhost Setup (XAMPP/WAMP)
+
+#### Step 1: Clone or Download
+```bash
+cd C:\xampp\htdocs  # or your web server root
+git clone https://github.com/MUMAR-TECH/synergex.git
 cd synergex
-Step 2: Create Database
-Open phpMyAdmin or MySQL command line
-Create a new database:
-sql
-CREATE DATABASE synergex_db CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
-Import the database schema:
-Via phpMyAdmin: Import the database.sql file
-Via command line:
-bash
-mysql -u root -p synergex_db < database.sql
-Step 3: Configure Database Connection
-Open config.php in a text editor
-Update the database credentials:
-php
-define('DB_HOST', 'localhost');
-define('DB_NAME', 'synergex_db');
-define('DB_USER', 'your_mysql_username');
-define('DB_PASS', 'your_mysql_password');
-Update the site URL:
-php
-define('SITE_URL', 'http://yourdomain.com/synergex');
-Step 4: Set File Permissions
-Set appropriate permissions for the uploads directory:
+```
 
-bash
-chmod 777 assets/images/uploads/
-For production, use more restrictive permissions:
+#### Step 2: Create Database
+1. Open phpMyAdmin: http://localhost/phpmyadmin
+2. Create database: `synergex_db`
+3. Import `synergex_db.sql`
 
-bash
-chmod 755 assets/images/uploads/
-chown www-data:www-data assets/images/uploads/
-Step 5: Configure Apache (Optional)
-If using Apache, create/edit .htaccess in the root directory:
+#### Step 3: Configure Environment
+1. Copy `.env.example` to `.env`
+2. Update database credentials:
+```env
+DB_HOST=localhost
+DB_NAME=synergex_db
+DB_USER=root
+DB_PASS=
+SITE_URL=http://localhost/synergex
+APP_ENV=development
+APP_DEBUG=true
+SESSION_COOKIE_SECURE=false
+```
 
-apache
-RewriteEngine On
-RewriteBase /synergex/
+#### Step 4: Create Admin Account
+1. Visit: http://localhost/synergex/admin/setup.php
+2. Create your admin account
+3. **Delete setup.php immediately after!**
 
-# Remove trailing slashes
-RewriteCond %{REQUEST_FILENAME} !-d
-RewriteRule ^(.*)/$ /$1 [L,R=301]
+#### Step 5: Test
+- Homepage: http://localhost/synergex
+- Admin: http://localhost/synergex/admin
 
-# Protect config files
-<FilesMatch "^(config\.php|database\.sql)$">
-    Order Allow,Deny
-    Deny from all
-</FilesMatch>
-Step 6: Test Installation
-Open your browser and navigate to: http://yourdomain.com/synergex/
-Verify the homepage loads correctly
-Check the admin panel: http://yourdomain.com/synergex/admin/
-📁 File Structure
+### cPanel Deployment
+
+**📚 For detailed cPanel deployment instructions, see:**
+- **[QUICK_DEPLOY.md](QUICK_DEPLOY.md)** - Fast 35-minute deployment checklist
+- **[CPANEL_DEPLOYMENT.md](CPANEL_DEPLOYMENT.md)** - Comprehensive deployment guide
+- **[LOCALHOST_VS_CPANEL.md](LOCALHOST_VS_CPANEL.md)** - Environment differences explained
+
+#### Quick cPanel Steps:
+
+1. **Create Database** (cPanel → MySQL Databases)
+   - Database name will be: `username_synergex_db`
+   - Create user with strong password
+   - Grant ALL PRIVILEGES
+
+2. **Import Database** (phpMyAdmin)
+   - Select your database
+   - Import `synergex_db.sql`
+
+3. **Upload Files** (Git or File Manager)
+   ```bash
+   # Via Git (recommended)
+   cPanel → Git Version Control → Clone Repository
+   
+   # Via File Manager
+   Upload all files to public_html
+   ```
+
+4. **Create .env File** (CRITICAL!)
+   ```env
+   # Create this file manually on cPanel - NEVER commit to Git!
+   DB_HOST=localhost
+   DB_NAME=username_synergex_db     # ← Your actual database name
+   DB_USER=username_dbuser          # ← Your database user
+   DB_PASS=your_password            # ← Your database password
+   SITE_URL=https://synergexsol.com # ← Your domain with HTTPS
+   APP_ENV=production
+   APP_DEBUG=false
+   SESSION_COOKIE_SECURE=true
+   ```
+
+5. **Install SSL Certificate** (cPanel → SSL/TLS)
+   - Use Let's Encrypt (free)
+   - Verify HTTPS works
+
+6. **Create Admin Account**
+   - Visit: https://yourdomain.com/admin/setup.php
+   - Create account
+   - **DELETE setup.php immediately!**
+
+7. **Verify Deployment**
+   - Upload `verify-deployment.php` from repository
+   - Visit: https://yourdomain.com/verify-deployment.php
+   - Check all items pass
+   - **DELETE verify-deployment.php after use!**
+
+#### Common cPanel Issues
+
+| Issue | Solution |
+|-------|----------|
+| HTTP 500 Error | Check `.env` file exists and is valid |
+| Database Connection Failed | Verify database name includes username prefix |
+| Redirect Loop | Already fixed - clear browser cookies |
+| Can't Upload Images | Set `uploads/` permissions to 755 |
+
+See [LOCALHOST_VS_CPANEL.md](LOCALHOST_VS_CPANEL.md) for complete troubleshooting guide.
+
+## 📁 File Structure
 synergex/
 │
 ├── 📄 config.php                    # Configuration file
@@ -446,5 +506,6 @@ Last Updated: December 17, 2024
 
 Built with ❤️ for a sustainable Zambia
 
-#   s y n e r g e x  
+#   s y n e r g e x 
+ 
  

@@ -153,6 +153,7 @@ class SessionManager {
             
             session_destroy();
         }
+        self::$initialized = false;
     }
     
     /**

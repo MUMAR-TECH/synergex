@@ -1,5 +1,38 @@
-# Environment Configuration
+# ============================================================================
+# SYNERGEX .gitignore
+# ============================================================================
+# Files and folders to exclude from version control
+
+# Environment Configuration - NEVER COMMIT THESE!
 .env
+.env.local
+.env.production
+.env.backup
+
+# Database Files - NEVER COMMIT THESE!
+*.sql
+*.sql.gz
+*.sql.zip
+database*.sql
+*_export.sql
+synergex_cpanel_export.sql
+
+# Testing/Debug Files - DELETE in production, never commit!
+security-check.php
+system-health.php
+fix-database.php
+test-*.php
+reset-password.php
+check-database.php
+debug-login.php
+verify-deployment.php
+export-database-cpanel.php
+
+# Logs
+*.log
+error_log
+debug.log
+logs/
 
 # IDE and Editor Files
 .vscode/
@@ -8,17 +41,6 @@
 *.swo
 *~
 .DS_Store
-
-# Logs
-*.log
-error_log
-debug.log
-
-# Testing/Debug Files (DELETE in production)
-security-check.php
-system-health.php
-fix-database.php
-test-*.php
 
 # Temporary Files
 tmp/

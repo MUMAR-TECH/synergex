@@ -18,7 +18,7 @@ $currentPage = basename($_SERVER['PHP_SELF'], '.php');
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Montserrat:wght@600;700&display=swap" rel="stylesheet">
     
     <!-- Font Awesome Icons -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="stylesheet" href="<?php echo SITE_URL; ?>/assets/vendor/font-awesome/css/all.min.css">
     
     <link rel="stylesheet" href="<?php echo SITE_URL; ?>/assets/css/admin.css">
 </head>

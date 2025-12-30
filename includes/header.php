@@ -1,8 +1,11 @@
 <?php
-// Clean up old flash messages from previous requests
-SessionManager::cleanFlashMessages();
-
 require_once __DIR__ . '/functions.php';
+
+// Clean up old flash messages from previous requests (only if SessionManager is available)
+if (class_exists('SessionManager')) {
+    SessionManager::cleanFlashMessages();
+}
+
 $siteName = getSetting('site_name', 'Synergex Solutions');
 $tagline = getSetting('tagline', 'Turning Waste Into Sustainable Value');
 $currentPage = basename($_SERVER['PHP_SELF'], '.php');
@@ -21,7 +24,7 @@ $currentPage = basename($_SERVER['PHP_SELF'], '.php');
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Montserrat:wght@500;600;700&display=swap" rel="stylesheet">
     
     <!-- Font Awesome Icons -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="stylesheet" href="<?php echo SITE_URL; ?>/assets/vendor/font-awesome/css/all.min.css">
     
     <!-- Stylesheet -->
     <link rel="stylesheet" href="<?php echo SITE_URL; ?>/assets/css/style.css">
